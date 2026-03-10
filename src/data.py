@@ -32,9 +32,9 @@ def preprocess_data(df):
     
     X = df.drop(columns=existing_cols_to_drop + ['group_id'])
     
-    # 2. Handle target
+    # 2. Handle target: Multiply by 10^8 then log10, exactly as the authors did
     y_raw = df['loss']
-    y = np.log10(y_raw.clip(lower=1e-10))
+    y = np.log10((y_raw * (10**8)).clip(lower=1e-10))
     
     # 3. Scale features
     scaler = StandardScaler()

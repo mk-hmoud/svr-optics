@@ -1,56 +1,48 @@
 import numpy as np
 import pandas as pd
+from src.wgan import train_wgan, generate_samples
 
-def augment_with_gaussian_noise(X, y, noise_level=0.05, num_synthetic_sets=1, random_state=42):
+def augment_with_wgan(X, y, num_synthetic_samples=1000, epochs=2000):
     """
-    Augments tabular data by adding Gaussian noise to features, 
-    with filtering to ensure physical plausibility.
+    Augments tabular data using a Wasserstein GAN with Gradient Penalty.
     
     Args:
     - X: DataFrame of features.
     - y: Series of target values (log10 loss).
-    - noise_level: The standard deviation of the noise relative to each feature's standard deviation.
-    - num_synthetic_sets: How many times to duplicate and noisy the original dataset.
+    - num_synthetic_samples: Number of synthetic samples to generate.
+    - epochs: Number of training epochs for the WGAN.
     
     Returns:
-    - X_combined: Original + Synthetic features (clipped to physical bounds).
+    - X_combined: Original + Synthetic features.
     - y_combined: Original + Synthetic targets.
     """
-    np.random.seed(random_state)
+    # 1. Prepare data for GAN (Features + Target in one matrix)
+    # Convert to numpy array
+    real_data = np.hstack([X.values, y.values.reshape(-1, 1)])
     
+    # 2. Train the WGAN
+    print(f"Training WGAN on {real_data.shape[0]} samples for {epochs} epochs...")
+    generator = train_wgan(real_data, epochs=epochs)
+    
+    # 3. Generate synthetic samples
+    synthetic_data = generate_samples(generator, num_samples=num_synthetic_samples)
+    
+    # 4. Filter and Clip to Physical Bounds
     # Calculate physical bounds from original data
-    # This ensures features like wavelength or pitch don't go outside the simulated range.
-    min_bounds = X.min(axis=0)
-    max_bounds = X.max(axis=0)
+    min_bounds = real_data.min(axis=0)
+    max_bounds = real_data.max(axis=0)
     
-    X_synthetic = []
-    y_synthetic = []
+    # Clip all generated columns (7 features + 1 target) to their respective bounds
+    # This ensures synthetic data remains "physically plausible".
+    synthetic_data = np.clip(synthetic_data, min_bounds, max_bounds)
     
-    # Calculate standard deviation for each column for proportional noise
-    std_devs = X.std(axis=0)
+    # 5. Separate features and target
+    X_synth = pd.DataFrame(synthetic_data[:, :-1], columns=X.columns)
+    y_synth = pd.Series(synthetic_data[:, -1])
     
-    for _ in range(num_synthetic_sets):
-        # Generate noise proportional to the standard deviation of each feature
-        noise = np.random.normal(0, std_devs * noise_level, size=X.shape)
-        X_aug = X + noise
-        
-        # CLIP to physical bounds: Matches the paper's filtering strategy to ensure 
-        # that synthetic samples are within the valid "numeric range of the application".
-        X_aug = X_aug.clip(lower=min_bounds, upper=max_bounds, axis=1)
-        
-        # Perturb target slightly based on feature noise
-        y_noise = np.random.normal(0, y.std() * noise_level * 0.1, size=y.shape)
-        y_aug = y + y_noise
-        
-        X_synthetic.append(X_aug)
-        y_synthetic.append(y_aug)
-        
-    X_synth_df = pd.concat(X_synthetic)
-    y_synth_series = pd.concat(y_synthetic)
-    
-    # Combine original and synthetic
-    X_combined = pd.concat([X, X_synth_df], ignore_index=True)
-    y_combined = pd.concat([y, y_synth_series], ignore_index=True)
+    # 6. Combine original and synthetic
+    X_combined = pd.concat([X, X_synth], ignore_index=True)
+    y_combined = pd.concat([y, y_synth], ignore_index=True)
     
     return X_combined, y_combined
 
@@ -64,12 +56,5 @@ if __name__ == '__main__':
     X, y, _, _ = preprocess_data(df)
     
     print(f"Original Data Shape: {X.shape}")
-    X_aug, y_aug = augment_with_gaussian_noise(X, y, noise_level=0.05, num_synthetic_sets=2)
+    X_aug, y_aug = augment_with_wgan(X, y, num_synthetic_samples=500, epochs=100)
     print(f"Augmented Data Shape: {X_aug.shape}")
-    
-    # Verify bounds
-    print("\nBounds Verification (Original vs Augmented):")
-    for col in X.columns:
-        orig_min, orig_max = X[col].min(), X[col].max()
-        aug_min, aug_max = X_aug[col].min(), X_aug[col].max()
-        print(f"{col}: Orig [{orig_min:.2f}, {orig_max:.2f}] | Aug [{aug_min:.2f}, {aug_max:.2f}]")
