@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, LeaveOneGroupOut
 from sklearn.preprocessing import StandardScaler
 
 def load_data(filepath='data/data.xlsx'):
@@ -12,39 +12,59 @@ def preprocess_data(df):
     """
     Preprocesses the data:
     1. Extracts features (X) and target (y).
-    2. Applies log10 to the target ('loss') as mentioned in the paper.
-    3. Scales the features using StandardScaler.
+    2. Drops constant or redundant features: 'Im(neff)', 'dc (um)'.
+    3. Applies log10 to the target ('loss').
+    4. Scales the features using StandardScaler.
     """
-    # The paper's target is confinement loss. The other columns are features.
-    # Note: 'Im(neff)' is directly related to loss mathematically, 
-    # so we should likely drop it from features to prevent data leakage.
+    # 1. Drop redundant/constant features
+    cols_to_drop = ['loss', 'Im(neff)', 'dc (um)']
+    existing_cols_to_drop = [c for c in cols_to_drop if c in df.columns]
     
-    if 'Im(neff)' in df.columns:
-        df = df.drop(columns=['Im(neff)'])
-        
-    X = df.drop(columns=['loss'])
-    # Handle any potential zero or negative loss values before log10
-    # To avoid log(0) issues, we can add a very small constant or filter
+    # Identify geometric configuration for grouping
+    config_cols = ['Pitch (um)', 'd1 (um)', 'd2 (um)', 'd3 (um)']
+    # Create unique group IDs based on geometric configurations
+    df_configs = df[config_cols].drop_duplicates().reset_index(drop=True)
+    df_configs['group_id'] = range(len(df_configs))
+    
+    # Merge group IDs back to the main dataframe
+    df = df.merge(df_configs, on=config_cols, how='left')
+    group_ids = df['group_id'].values
+    
+    X = df.drop(columns=existing_cols_to_drop + ['group_id'])
+    
+    # 2. Handle target
     y_raw = df['loss']
     y = np.log10(y_raw.clip(lower=1e-10))
     
+    # 3. Scale features
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
-    
-    # Keep feature names for later analysis
     X_scaled_df = pd.DataFrame(X_scaled, columns=X.columns)
     
-    return X_scaled_df, y, scaler
+    return X_scaled_df, y, group_ids, scaler
 
-def get_train_test_split(X, y, test_size=0.2, random_state=42):
-    """Splits the data into training and testing sets."""
-    return train_test_split(X, y, test_size=test_size, random_state=random_state)
+def get_logo_folds(X, y, groups):
+    """
+    Returns a Leave-One-Group-Out cross-validation generator.
+    Allows testing on completely new geometric configurations.
+    """
+    logo = LeaveOneGroupOut()
+    return logo.split(X, y, groups)
 
 if __name__ == '__main__':
     df = load_data()
-    print("Data loaded successfully. Shape:", df.shape)
-    X, y, scaler = preprocess_data(df)
-    print("Features shape:", X.shape)
-    print("Target shape:", y.shape)
-    X_train, X_test, y_train, y_test = get_train_test_split(X, y)
-    print(f"Train size: {X_train.shape[0]}, Test size: {X_test.shape[0]}")
+    print("Data loaded. Shape:", df.shape)
+    X, y, groups, scaler = preprocess_data(df)
+    print("Features (X):", X.columns.tolist())
+    print(f"Number of groups: {len(np.unique(groups))}")
+    
+    # Simple check for LOGO split
+    logo = get_logo_folds(X, y, groups)
+    train_idx, test_idx = next(logo)
+    print(f"First fold: Train size={len(train_idx)}, Test size={len(test_idx)}")
+    
+    # Verify that test configuration is not in train
+    train_groups = groups[train_idx]
+    test_groups = groups[test_idx]
+    print(f"Unique train groups: {np.unique(train_groups)}")
+    print(f"Unique test groups: {np.unique(test_groups)}")
