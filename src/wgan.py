@@ -4,7 +4,7 @@ import torch.optim as optim
 import numpy as np
 
 class Generator(nn.Module):
-    def __init__(self, input_dim=7, output_dim=8):
+    def __init__(self, input_dim=7, output_dim=7):
         super(Generator, self).__init__()
         self.model = nn.Sequential(
             nn.Linear(input_dim, 32),
@@ -22,7 +22,7 @@ class Generator(nn.Module):
         return self.model(z)
 
 class Critic(nn.Module):
-    def __init__(self, input_dim=8):
+    def __init__(self, input_dim=7):
         super(Critic, self).__init__()
         self.model = nn.Sequential(
             nn.Linear(input_dim, 128),
@@ -62,11 +62,11 @@ def compute_gradient_penalty(critic, real_samples, fake_samples):
 
 def train_wgan(train_data, epochs=2000, batch_size=32, n_critic=5, lr=0.0001):
     """Trains the WGAN-GP on the provided data."""
-    # train_data should be a numpy array of shape (N, 8)
+    # train_data shape: (N, 7) -- 6 features + 1 target
     data_tensor = torch.FloatTensor(train_data)
     
     input_dim = 7 # Noise dimension
-    output_dim = 8 # Features + Target
+    output_dim = 7 # Features + Target
     
     generator = Generator(input_dim, output_dim)
     critic = Critic(output_dim)
