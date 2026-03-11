@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, LeaveOneGroupOut
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 
 def load_data(filepath='data/data.xlsx'):
     """Loads the dataset from the Excel file."""
@@ -12,12 +12,12 @@ def preprocess_data(df):
     """
     Preprocesses the data:
     1. Extracts features (X) and target (y).
-    2. Drops constant or redundant features: 'Im(neff)', 'dc (um)'.
+    2. Drops constant or redundant features: 'Im(neff)', 'dc (um)', 'Re(eff)'.
     3. Applies log10 to the target ('loss').
-    4. Scales the features using StandardScaler.
+    4. Scales the features using MinMaxScaler.
     """
     # 1. Drop redundant/constant features
-    cols_to_drop = ['loss', 'Im(neff)', 'dc (um)']
+    cols_to_drop = ['loss', 'Im(neff)', 'dc (um)', 'Re(eff)']
     existing_cols_to_drop = [c for c in cols_to_drop if c in df.columns]
     
     # Identify geometric configuration for grouping
@@ -37,7 +37,7 @@ def preprocess_data(df):
     y = np.log10((y_raw * (10**8)).clip(lower=1e-10))
     
     # 3. Scale features
-    scaler = StandardScaler()
+    scaler = MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
     X_scaled_df = pd.DataFrame(X_scaled, columns=X.columns)
     

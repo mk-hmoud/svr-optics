@@ -1,23 +1,33 @@
 import numpy as np
 import pandas as pd
+import os
 from src.wgan import train_wgan, generate_samples
+
+def load_researcher_data(filepath='data/gen_data.txt', feature_columns=None):
+    """
+    Loads pre-generated synthetic data provided by researchers.
+    """
+    if not os.path.exists(filepath):
+        print(f"Warning: {filepath} not found.")
+        return None, None
+        
+    # Assuming CSV format without header: 7 features + 1 target
+    data = pd.read_csv(filepath, header=None)
+    
+    # Separate features and target
+    X_synth = data.iloc[:, :-1]
+    y_synth = data.iloc[:, -1]
+    
+    if feature_columns is not None:
+        X_synth.columns = feature_columns
+        
+    return X_synth, y_synth
 
 def augment_with_wgan(X, y, num_synthetic_samples=1000, epochs=2000):
     """
     Augments tabular data using a Wasserstein GAN with Gradient Penalty.
-    
-    Args:
-    - X: DataFrame of features.
-    - y: Series of target values (log10 loss).
-    - num_synthetic_samples: Number of synthetic samples to generate.
-    - epochs: Number of training epochs for the WGAN.
-    
-    Returns:
-    - X_combined: Original + Synthetic features.
-    - y_combined: Original + Synthetic targets.
     """
     # 1. Prepare data for GAN (Features + Target in one matrix)
-    # Convert to numpy array
     real_data = np.hstack([X.values, y.values.reshape(-1, 1)])
     
     # 2. Train the WGAN
@@ -28,12 +38,8 @@ def augment_with_wgan(X, y, num_synthetic_samples=1000, epochs=2000):
     synthetic_data = generate_samples(generator, num_samples=num_synthetic_samples)
     
     # 4. Filter and Clip to Physical Bounds
-    # Calculate physical bounds from original data
     min_bounds = real_data.min(axis=0)
     max_bounds = real_data.max(axis=0)
-    
-    # Clip all generated columns (7 features + 1 target) to their respective bounds
-    # This ensures synthetic data remains "physically plausible".
     synthetic_data = np.clip(synthetic_data, min_bounds, max_bounds)
     
     # 5. Separate features and target
@@ -48,13 +54,12 @@ def augment_with_wgan(X, y, num_synthetic_samples=1000, epochs=2000):
 
 if __name__ == '__main__':
     from src.data import load_data, preprocess_data
-    import os
     import sys
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     
     df = load_data('data/data.xlsx')
     X, y, _, _ = preprocess_data(df)
     
-    print(f"Original Data Shape: {X.shape}")
-    X_aug, y_aug = augment_with_wgan(X, y, num_synthetic_samples=500, epochs=100)
-    print(f"Augmented Data Shape: {X_aug.shape}")
+    X_synth, y_synth = load_researcher_data('data/gen_data.txt', feature_columns=X.columns)
+    if X_synth is not None:
+        print(f"Loaded Researcher Data: {X_synth.shape}")
