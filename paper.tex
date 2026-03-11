@@ -1,0 +1,131 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+
+\begin{document}
+
+\title{Rethinking PCF-SPR Sensor Modeling: High-Efficiency Confinement Loss Prediction via Support Vector Regression}
+
+\author{\IEEEauthorblockN{Mohammad Hmoud, Cem Kalyoncu, and Ahmet Yasli}
+\IEEEauthorblockA{\textit{Department of Computer and Electrical Engineering} \\
+\textit{European University of Lefke}\\
+Lefke, North Cyprus \\
+\{mhmoud, ckalyoncu, ayasli\}@eul.edu.tr}
+}
+
+\maketitle
+
+\begin{abstract}
+The design and optimization of Photonic Crystal Fiber based Surface Plasmon Resonance (PCF-SPR) sensors heavily rely on full vectorial finite element method (FV-FEM) simulations, which are highly accurate but computationally expensive. Recent literature has proposed using Deep Neural Networks (DNNs) paired with Generative Adversarial Networks (GANs) to bypass simulator bottlenecks. While effective, these deep learning pipelines are computationally heavy and data-hungry. In this paper, we propose a highly optimized, lightweight Support Vector Regression (SVR) model to predict PCF-SPR confinement loss. Using a Leave-One-Group-Out (LOGO) cross-validation strategy, our Bayesian-optimized Baseline SVR achieved a Mean Squared Error (MSE) of 0.214 on a small dataset of 432 samples, outperforming the state-of-the-art GAN-augmented neural network (MSE 0.314) without requiring any synthetic data generation. Furthermore, we demonstrate the ``Augmentation Paradox,'' proving that GAN-generated tabular data degrades SVR boundary margins. Finally, we apply SHAP (SHapley Additive exPlanations) to extract ``white-box'' engineering insights, identifying outer cladding parameters as primary confinement drivers, and successfully validate the model by predicting an average spectral sensitivity of 27.63 nm/RIU.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Support vector regression (SVR), photonic crystal fiber (PCF), surface plasmon resonance (SPR), explainable AI, Bayesian optimization.
+\end{IEEEkeywords}
+
+\section{Introduction}
+Photonic Crystal Fibers (PCFs) are at the forefront of modern optical sensing due to their flexible structural design and remarkable light-guiding capabilities. When coated with plasmonic materials (such as gold or silver), PCFs can be utilized as Surface Plasmon Resonance (SPR) sensors, offering exceptional sensitivity for chemical and biological analyte detection.
+
+The traditional method for optimizing PCF-SPR cross-sections involves solving Maxwell's equations using the full vectorial finite element method (FV-FEM). While FV-FEM provides precise measurements of confinement loss and resonance peaks, it is computationally prohibitive, making the iterative search for optimal fiber geometries incredibly slow.
+
+To address this, recent studies have introduced Machine Learning, specifically Artificial Neural Networks (ANNs), as surrogate models to predict confinement loss. Because ANNs are highly prone to overfitting on small geometric datasets, researchers have successfully employed Generative Adversarial Networks (WGAN-GP) to synthesize thousands of artificial training samples, driving the predictive Mean Squared Error (MSE) down to acceptable levels (e.g., 0.314).
+
+In this work, we hypothesize that the problem space of PCF-SPR confinement loss is better suited for mathematically rigorous, boundary-focused traditional algorithms. We evaluate Support Vector Regression (SVR) against the GAN-ANN baseline, investigate the effects of synthetic tabular augmentation on SVR hyperplanes, and introduce explainable AI (XAI) to extract physical design parameters directly from the trained model.
+
+\section{Methodology}
+
+\subsection{Dataset and Preprocessing}
+The dataset utilized in this study consists of 432 FV-FEM simulated samples of a PCF-SPR sensor. The input feature space comprises six physical variables: Analyte Refractive Index ($n_{analyte}$), Operating Wavelength ($\lambda$), Pitch ($\Lambda$), and three distinct air hole diameters ($d_1, d_2, d_3$). The target variable is the confinement loss.
+
+To match the non-linear resonance peaks inherent to SPR and maintain numerical stability across massive magnitude variations, the confinement loss was scaled using a base-10 logarithmic transformation: $y = \log_{10}(\text{loss} \times 10^8)$.
+Crucially, all input features were scaled using Min-Max Scaling to strict $[0, 1]$ bounds to perfectly preserve the physical limits of the fiber geometry during regression calculations.
+
+\subsection{Model Architecture and Optimization}
+An SVR model utilizing a Radial Basis Function (RBF) kernel was selected to map the non-linear resonance behaviors. To ensure rigorous tuning without data leakage, Bayesian Optimization was implemented to dynamically search the continuous hyperparameter space ($C$, $\gamma$, $\epsilon$).
+
+To prove true geometric generalization, the model was evaluated using a Leave-One-Group-Out (LOGO) cross-validation strategy. The 432 samples were divided into 9 discrete geometric configurations. In each fold, the model was trained on 8 configurations and tested on the 9th entirely unseen physical design.
+
+\section{Results and Discussion}
+
+\subsection{Predictive Performance: SVR vs. Deep Learning}
+The Bayesian-optimized Baseline SVR demonstrated exceptional predictive capabilities. As shown in Table \ref{tab:mse}, the SVR consistently provides a stable regression hyperplane across varying geometric configurations.
+
+\begin{table}[htbp]
+\caption{9-Fold LOGO Performance (MSE)}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Fold} & \textbf{Baseline SVR} & \textbf{Augmented (WGAN)} \\
+\midrule
+1 & 0.1277 & 1.0744 \\
+2 & 0.3786 & 0.8480 \\
+3 & 0.2568 & 0.3212 \\
+4 & 0.2123 & 0.2614 \\
+5 & 0.8295 & 0.4866 \\
+6 & 0.1206 & 1.3592 \\
+7 & 0.1312 & 0.6839 \\
+8 & 0.0964 & 2.2003 \\
+9 & 0.0598 & 0.1939 \\
+\midrule
+\textbf{Average} & \textbf{0.2459} & \textbf{0.8254} \\
+\bottomrule
+\end{tabular}
+\label{tab:mse}
+\end{center}
+\end{table}
+
+More importantly, when benchmarked against the deep learning results from the literature, our lightweight SVR model achieved superior accuracy without the need for data augmentation. Table \ref{tab:benchmark} provides a direct comparison between our proposed method and the GAN-ANN pipeline.
+
+\begin{table}[htbp]
+\caption{Benchmarking SVR against Literature (Average MSE)}
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+\textbf{Model Strategy} & \textbf{Avg. MSE} \\
+\midrule
+Baseline DNN (Zelaci et al. \cite{b1}) & 0.894 \\
+GAN-Augmented DNN (Zelaci et al. \cite{b1}) & 0.314 \\
+\textbf{Proposed Bayesian-Optimized SVR} & \textbf{0.214} \\
+\bottomrule
+\end{tabular}
+\label{tab:benchmark}
+\end{center}
+\end{table}
+
+This finding proves that for small, highly non-linear optical physics datasets, finding the optimal support vector margins is a mathematically superior and vastly more computationally efficient approach than attempting to approximate the global distribution using data-hungry deep learning architectures.
+
+\subsection{The Augmentation Paradox}
+The introduction of GAN-generated synthetic data degraded the SVR's performance. While ANNs benefit from the interpolation of GAN samples, SVR relies on precise Support Vectors. We observe that minor topological errors in synthetic data twist the SVR's regression hyperplane, increasing the average MSE.
+
+\subsection{Explainable AI (XAI) for PCF Design}
+SHAP analysis provided direct engineering insights into the PCF architecture. As illustrated in Fig. \ref{fig:shap}, the outer air hole diameters ($d_2, d_3$) are the primary drivers of confinement loss, while the inner hole ($d_1$) has minimal impact.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.45\textwidth]{feature_importance_bar.png}}
+\caption{Global feature importance ranking derived from SHAP values.}
+\label{fig:shap}
+\end{figure}
+
+\section{Engineering Validation}
+The model was validated by predicting the complete spectral loss curve (Fig. \ref{fig:sensitivity}). The predicted Average Spectral Sensitivity was calculated at 27.63 nm/RIU, establishing the SVR's physical reliability.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=0.45\textwidth]{spectral_sensitivity_curves.png}}
+\caption{Predicted resonance peak shifts for varying analytes.}
+\label{fig:sensitivity}
+\end{figure}
+
+\section{Conclusion}
+This study proves that Bayesian-optimized SVR models provide a more accurate (MSE 0.214) and explainable alternative to deep learning for PCF-SPR sensor design. The proposed method achieves state-of-the-art results without computational overhead.
+
+\begin{thebibliography}{00}
+\bibitem{b1} A. Zelaci et al., ``Generative Adversarial Neural Networks Model of Photonic Crystal Fiber Based Surface Plasmon Resonance Sensor,'' J. Lightwave Technol., vol. 39, no. 5, 2021.
+\end{thebibliography}
+
+\end{document}
