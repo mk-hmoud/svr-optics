@@ -1,50 +1,21 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import numpy as np
 import pandas as pd
-from sklearn.svm import SVR
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C, WhiteKernel
-from sklearn.ensemble import RandomForestRegressor
-import xgboost as xgb
 from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import GridSearchCV
-from skopt import BayesSearchCV
-from skopt.space import Real, Categorical, Integer
+from sklearn.model_selection import train_test_split
 from src.data import load_data, preprocess_data, get_logo_folds
-from src.data_augmentation import augment_with_wgan
-import os
+from src.models.researcher_ann import build_researcher_ann, train_ann
 import sys
 
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-def train_best_svr_grid(X_train, y_train):
-    """Finds optimal SVR hyperparameters using Grid Search."""
-    param_grid = {
-        'C': [100, 500, 1000, 2000],
-        'gamma': ['scale', 'auto', 0.1, 0.01],
-        'epsilon': [0.01, 0.1],
-        'kernel': ['rbf']
-    }
-    grid = GridSearchCV(SVR(), param_grid, cv=3, n_jobs=-1, scoring='neg_mean_squared_error')
-    grid.fit(X_train, y_train)
-    return grid.best_estimator_
-
-def train_best_rf(X_train, y_train):
-    """Trains a Random Forest Regressor using Grid Search."""
-    param_grid = {
-        'n_estimators': [100, 200, 500],
-        'max_depth': [None, 10, 20],
-        'min_samples_split': [2, 5],
-        'random_state': [42]
-    }
-    grid = GridSearchCV(RandomForestRegressor(), param_grid, cv=3, n_jobs=-1, scoring='neg_mean_squared_error')
-    grid.fit(X_train, y_train)
-    return grid.best_estimator_
-
-def evaluate_logo_comparison(gan_epochs=1000, num_synthetic=500):
+def evaluate_logo_ann_only():
     """
-    Performs 9-fold LOGO cross-validation for:
-    SVR, RF (Baseline), and RF (GAN-Augmented).
+    Performs 9-fold LOGO cross-validation specifically for the Researcher's ANN.
+    Reduced model scope to save memory.
     """
     print("Loading and preprocessing data...")
     df = load_data()
@@ -53,49 +24,37 @@ def evaluate_logo_comparison(gan_epochs=1000, num_synthetic=500):
     
     results = []
     
-    print(f"\n{'Fold':<5} | {'SVR MSE':<10} | {'RF MSE':<10} | {'RF+GAN MSE':<12}")
-    print("-" * 55)
+    print(f"\n{'Fold':<5} | {'ANN MSE':<10}")
+    print("-" * 20)
     
     for fold, (train_idx, test_idx) in enumerate(logo, 1):
         X_train_raw, X_test = X.iloc[train_idx], X.iloc[test_idx]
         y_train_raw, y_test = y.iloc[train_idx], y.iloc[test_idx]
         
-        # 1. Baseline SVR
-        svr = train_best_svr_grid(X_train_raw, y_train_raw)
-        mse_svr = mean_squared_error(y_test, svr.predict(X_test))
+        # Split train into train and val for early stopping
+        X_tr, X_val, y_tr, y_val = train_test_split(X_train_raw, y_train_raw, test_size=0.1, random_state=42)
         
-        # 2. Baseline Random Forest
-        rf_base = train_best_rf(X_train_raw, y_train_raw)
-        mse_rf_base = mean_squared_error(y_test, rf_base.predict(X_test))
+        # Build and train ANN
+        ann = build_researcher_ann(input_dim=X.shape[1])
+        train_ann(ann, X_tr, y_tr, X_val, y_val, epochs=500) # Further reduced epochs for memory safety
         
-        # 3. GAN-Augmented Random Forest
-        # We train our WGAN-GP on the current training fold
-        X_train_aug, y_train_aug = augment_with_wgan(
-            X_train_raw, y_train_raw, 
-            num_synthetic_samples=num_synthetic, 
-            epochs=gan_epochs
-        )
-        rf_aug = train_best_rf(X_train_aug, y_train_aug)
-        mse_rf_aug = mean_squared_error(y_test, rf_aug.predict(X_test))
+        mse_ann = mean_squared_error(y_test, ann.predict(X_test, verbose=0).flatten())
         
-        print(f"{fold:<5} | {mse_svr:<10.6f} | {mse_rf_base:<10.6f} | {mse_rf_aug:<12.6f}")
-        results.append({
-            'Fold': fold, 
-            'SVR_MSE': mse_svr, 
-            'RF_Baseline_MSE': mse_rf_base, 
-            'RF_GAN_MSE': mse_rf_aug
-        })
+        print(f"{fold:<5} | {mse_ann:<10.6f}")
+        results.append({'Fold': fold, 'ANN_MSE': mse_ann})
+        
+        # Explicitly clear Keras session to free memory after each fold
+        import tensorflow as tf
+        tf.keras.backend.clear_session()
         
     res_df = pd.DataFrame(results)
-    numeric_results = res_df.drop(columns=['Fold'])
-    avg = numeric_results.mean()
+    avg = res_df['ANN_MSE'].mean()
     
-    print("-" * 55)
-    print(f"{'AVG':<5} | {avg['SVR_MSE']:<10.6f} | {avg['RF_Baseline_MSE']:<10.6f} | {avg['RF_GAN_MSE']:<12.6f}")
+    print("-" * 20)
+    print(f"{'AVG':<5} | {avg:<10.6f}")
     
-    res_df.to_csv('results_gan_rf_comparison.csv', index=False)
-    print("\nResults saved to 'results_gan_rf_comparison.csv'")
+    res_df.to_csv('results_comparison_researcher_ann_only.csv', index=False)
+    print("\nResults saved to 'results_comparison_researcher_ann_only.csv'")
 
 if __name__ == '__main__':
-    # Using 500 epochs for the test run to keep it reasonably fast
-    evaluate_logo_comparison(gan_epochs=500, num_synthetic=500)
+    evaluate_logo_ann_only()
