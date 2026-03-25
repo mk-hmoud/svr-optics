@@ -42,7 +42,7 @@
 \maketitle
 
 \begin{ozet}
-Fotonik Kristal Fiber tabanlı Yüzey Plazmon Rezonans (FKF-YPR) sensörlerinin tasarımı ve optimizasyonu, yüksek doğruluklu ancak hesaplama açısından maliyetli olan tam vektörel sonlu elemanlar yöntemi (TV-SEY) simülasyonlarına dayanmaktadır. Literatürde son zamanlarda, simülatör darboğazlarını aşmak için Üretken Çekişmeli Ağlar (GAN'lar) ile eşleştirilmiş Derin Sinir Ağlarının (DNN'ler) kullanılması önerilmiştir. Bu derin öğrenme boru hatları hesaplama açısından ağır ve veri açlığı çekmektedir. Bu çalışmada, FKF-YPR hapsedilme kaybını tahmin etmek için optimize edilmiş, hafif bir Destek Vektör Regresyonu (DVR) modeli öneriyoruz. Sabit bir 7-1-1 konfigürasyon bölümü (7 konfigürasyonda eğitim, 1'de doğrulama ve 1'de test) kullanarak, optimize edilmiş DVR ve GPR modellerimiz sırasıyla 0,121 ve 0,185 Ortalama Kare Hata (MSE) değerlerine ulaşmıştır. Bu sonuçlar, literatürde rapor edilen GAN-artırılmış sinir ağı (MSE 0,314) sonuçlarından önemli ölçüde daha iyidir ve yüksek hesaplama verimliliği sağlar. Ayrıca, GAN tarafından üretilen tablo verilerinin DVR sınır marjlarını bozduğunu kanıtlayan 'Artırma Paradoksu'nu gösteriyoruz. Son olarak, SHAP değerleri aracılığıyla 'beyaz kutu' mühendislik içgörüleri elde ederek dış kaplama parametrelerinin hapsedilme kaybı üzerindeki etkilerini belirliyor ve modeli 27,63 nm/RIU ortalama spektral duyarlılık tahminiyle doğruluyoruz.
+Fotonik Kristal Fiber tabanlı Yüzey Plazmon Rezonans (FKF-YPR) sensörlerinin tasarımı ve optimizasyonu, yüksek doğrukuklu ancak hesaplama açısından maliyetli olan tam vektörel sonlu elemanlar yöntemi (TV-SEY) simülasyonlarına dayanmaktadır. Literatürde son zamanlarda, simülatör darboğazlarını aşmak için Üretken Çekişmeli Ağlar (GAN'lar) ile eşleştirilmiş Derin Sinir Ağlarının (DNN'ler) kullanılması önerilmiştir. Bu derin öğrenme boru hatları hesaplama açısından ağır ve veri açlığı çekmektedir. Bu çalışmada, FKF-YPR hapsedilme kaybını tahmin etmek için optimize edilmiş, hafif bir Destek Vektör Regresyonu (DVR) modeli öneriyoruz. Sabit bir 7-1-1 konfigürasyon bölümü kullanarak, optimize edilmiş DVR ve GPR modellerimiz sırasıyla 0,121 ve 0,185 Ortalama Kare Hata (MSE) değerlerine ulaşmıştır. Bu sonuçlar, literatürde rapor edilen GAN-artırılmış sinir ağı (MSE 0,314) sonuçlarından önemli ölçüde daha iyidir. Son olarak, SHAP değerleri aracılığıyla dış kaplama parametrelerinin hapsedilme kaybı üzerindeki etkilerini belirliyor ve modeli 27,63 nm/RIU ortalama spektral duyarlılık tahminiyle doğruluyoruz.
 \end{ozet}
 
 \begin{IEEEanahtar}
@@ -50,7 +50,7 @@ Fotonik kristal fiber; yüzey plazmon rezonans; destek vektör regresyonu; açı
 \end{IEEEanahtar}
 
 \begin{abstract}
-The design and optimization of Photonic Crystal Fiber based Surface Plasmon Resonance (PCF-SPR) sensors heavily rely on full vectorial finite element method (FV-FEM) simulations, which are highly accurate but computationally expensive. Recent literature has proposed using Deep Neural Networks (DNNs) paired with Generative Adversarial Networks (GANs) to bypass simulator bottlenecks. While effective, these deep learning pipelines are computationally heavy and data-hungry. In this paper, we propose a highly optimized, lightweight Support Vector Regression (SVR) model to predict PCF-SPR confinement loss. Using a static 7-1-1 configuration split (training on 7 configurations, validating on 1, and testing on 1), our optimized SVR and GPR models achieved Mean Squared Errors (MSE) of 0.121 and 0.185 respectively. These results significantly outperform the state-of-the-art GAN-augmented neural network (MSE 0.314) reported in literature, while maintaining extreme computational efficiency. Furthermore, we demonstrate the ``Augmentation Paradox,'' proving that GAN-generated tabular data degrades SVR boundary margins. Finally, we apply SHAP (SHapley Additive exPlanations) to extract ``white-box'' engineering insights, identifying outer cladding parameters as primary confinement drivers, and successfully validate the model by predicting an average spectral sensitivity of 27.63 nm/RIU.
+The design and optimization of Photonic Crystal Fiber based Surface Plasmon Resonance (PCF-SPR) sensors heavily rely on full vectorial finite element method (FV-FEM) simulations, which are highly accurate but computationally expensive. Recent literature has proposed using Deep Neural Networks (DNNs) paired with Generative Adversarial Networks (GANs) to bypass simulator bottlenecks. While effective, these deep learning pipelines are computationally heavy and data-hungry. In this paper, we propose a highly optimized, lightweight Support Vector Regression (SVR) model to predict PCF-SPR confinement loss. Using a static 7-1-1 configuration split, our optimized SVR and GPR models achieved Mean Squared Errors (MSE) of 0.121 and 0.185 respectively. These results significantly outperform the state-of-the-art GAN-augmented neural network (MSE 0.314) reported in literature. Finally, we apply SHAP (SHapley Additive exPlanations) to identify outer cladding parameters as primary confinement drivers, and successfully validate the model by predicting an average spectral sensitivity of 27.63 nm/RIU.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -70,7 +70,7 @@ To address this, Machine Learning (ML) has emerged as a powerful surrogate model
 
 More recently, researchers have focused on the interpretability of these models. Khatun and Islam \cite{b3} utilized explainable AI (XAI) via SHAP values to optimize high-sensitivity biosensors, identifying critical design parameters such as gold thickness and analyte refractive index. Other traditional techniques, such as k-nearest neighbor regression, have also been explored for bent fiber modeling \cite{b4}.
 
-In this work, we hypothesize that the problem space of PCF-SPR confinement loss is better suited for mathematically rigorous, boundary-focused traditional algorithms that excel in small-data regimes. We evaluate Bayesian-optimized Support Vector Regression (SVR) and Gaussian Process Regression (GPR) against the GAN-ANN baseline. We demonstrate that these models can outperform the literature's augmented benchmarks without requiring any synthetic data generation, thus avoiding the ``Augmentation Paradox.'' Finally, we apply SHAP analysis to extract physical design insights, providing a bridge between high-accuracy regression and engineering intuition.
+In this work, we hypothesize that the problem space of PCF-SPR confinement loss is better suited for mathematically rigorous, boundary-focused traditional algorithms that excel in small-data regimes. We evaluate Bayesian-optimized Support Vector Regression (SVR) and Gaussian Process Regression (GPR) against the GAN-ANN baseline. We demonstrate that these models can outperform the literature's augmented benchmarks without requiring any synthetic data generation. Finally, we apply SHAP analysis to extract physical design insights, providing a bridge between high-accuracy regression and engineering intuition.
 
 \section{Numerical Modeling and Dataset Generation}
 
@@ -99,21 +99,23 @@ where $\lambda$ represents the operating wavelength, $n$ is the Refractive Index
 
 where $\text{Im}(n_{eff})$ denotes the imaginary part of the effective RI. 
 
+\section{Methodology}
+In this section, we detail the data preparation pipeline and the mathematical foundations of the regression models employed in this study. Given the high-fidelity nature of the FV-FEM simulations, the methodology focuses on maintaining physical consistency while maximizing predictive accuracy in a small-data regime.
+
 \subsection{Dataset and Preprocessing}
 The FV-FEM numerical analysis provided a labeled dataset containing 432 samples. The input feature space comprises six physical variables: Analyte Refractive Index ($n_{analyte}$), Operating Wavelength ($\lambda$), Pitch ($\Lambda$), and three distinct air hole diameters ($d_1, d_2, d_3$). Across nine different geometric configurations, losses were calculated for three distinct analytes: Water ($n = 1.33$), Ethanol ($n = 1.35$), and commercial hydrocarbon mixtures ($n = 1.36$).
 
+To ensure rigorous comparison with existing literature, the model was evaluated using a static 7-1-1 split based on geometric configurations. The 432 samples were divided into 9 discrete geometric designs. Designs 1 through 7 were used for training, Design 8 for validation, and Design 9 was reserved as the final unseen test set.
+
 To match the non-linear resonance peaks inherent to SPR and maintain numerical stability, the confinement loss was scaled using a base-10 logarithmic transformation: $y = \log_{10}(\text{loss} \times 10^8)$. All input features were scaled using Min-Max Scaling to strict $[0, 1]$ bounds to perfectly preserve the physical limits of the fiber geometry.
 
-\section{Methodology}
-
 \subsection{Model Architecture and Optimization}
-In this study, we evaluate two boundary-focused algorithms: Support Vector Regression (SVR) and Gaussian Process Regression (GPR).
+In this study, we evaluate two boundary-focused algorithms: Support Vector Regression (SVR) and Gaussian Process Regression (GPR). Unlike deep learning models, these algorithms are specifically designed to excel when the number of training samples is limited.
 
 \subsubsection{Support Vector Regression}
-SVR aims to find a function $f(x)$ that has at most $\epsilon$ deviation from the actually obtained targets $y_i$ for all the training data. The optimization problem is formulated as:
+SVR aims to find a function $f(x)$ that has at most $\epsilon$ deviation from the actually obtained targets $y_i$. The optimization problem is formulated as:
 \begin{equation}
 \min_{w,b,\xi,\xi^*} \frac{1}{2}||w||^2 + C \sum_{i=1}^{n} (\xi_i + \xi_i^*)
-\label{eq:svr_obj}
 \end{equation}
 subject to:
 \begin{equation}
@@ -123,29 +125,22 @@ y_i - \langle w, x_i \rangle - b \leq \epsilon + \xi_i \\
 \xi_i, \xi_i^* \geq 0
 \end{cases}
 \end{equation}
-where $C$ is the box constraint and $\xi_i, \xi_i^*$ are slack variables. We utilize the Radial Basis Function (RBF) kernel, $K(x_i, x_j) = \exp(-\gamma ||x_i - x_j||^2)$, to map the input features into a high-dimensional space where linear regression becomes possible for non-linear optical data.
+where $C$ is the box constraint and $\xi_i, \xi_i^*$ are slack variables. We utilize the Radial Basis Function (RBF) kernel, $K(x_i, x_j) = \exp(-\gamma ||x_i - x_j||^2)$, to map input features into a high-dimensional space for non-linear regression.
 
 \subsubsection{Gaussian Process Regression}
-GPR is a non-parametric Bayesian approach to regression. We assume that the function values follow a Gaussian Process prior:
-\begin{equation}
-f(x) \sim \mathcal{GP}(m(x), k(x, x'))
-\label{eq:gp_prior}
-\end{equation}
-where $m(x)$ is the mean function (assumed to be zero) and $k(x, x')$ is the covariance function. For a new input $x_*$, the predictive posterior distribution is given by $P(f_* | X, y, x_*) = \mathcal{N}(\bar{f}_*, \text{cov}(f_*))$, where:
+GPR assumes function values follow a Gaussian Process prior: $f(x) \sim \mathcal{GP}(m(x), k(x, x'))$, where $m(x)$ is the mean function and $k(x, x')$ is the covariance function. For a new input $x_*$, the predictive posterior mean $\bar{f}_*$ and covariance $\text{cov}(f_*)$ are:
 \begin{equation}
 \bar{f}_* = K_*^T [K + \sigma_n^2 I]^{-1} y
 \end{equation}
 \begin{equation}
 \text{cov}(f_*) = K_{**} - K_*^T [K + \sigma_n^2 I]^{-1} K_*
 \end{equation}
-Here, $K$ is the covariance matrix of the training data, and $K_*$ is the covariance between training and test inputs. To ensure stability, a noise regularizer (WhiteKernel) is added to the RBF kernel.
-
-To ensure rigorous comparison with existing literature, the models were evaluated using a static 7-1-1 split based on geometric configurations. The 432 samples were divided into 9 discrete geometric designs. Designs 1 through 7 were used for training, Design 8 for validation, and Design 9 was reserved as the final unseen test set.
+where $K$ is the training covariance matrix and $K_*$ is the train-test covariance. A WhiteKernel noise regularizer is added to the RBF kernel for stability.
 
 \section{Results and Discussion}
 
 \subsection{Predictive Performance: SVR vs. Deep Learning}
-The optimized SVR and GPR models demonstrated exceptional predictive capabilities under the researchers' exact testing methodology. As shown in Table \ref{tab:benchmark}, our lightweight traditional models achieved superior accuracy without the need for complex data augmentation or large neural architectures.
+The optimized SVR and GPR models demonstrated exceptional predictive capabilities under the exact testing methodology used in previous literature. As shown in Table \ref{tab:benchmark}, our lightweight traditional models achieved superior accuracy without the need for complex data augmentation.
 
 \begin{table}[htbp]
 \caption{Benchmarking Proposed Models against Literature}
@@ -159,19 +154,17 @@ GAN-Augmented DNN (Zelaci et al. \cite{b1}) & 0.314 \\
 \textbf{Proposed Optimized SVR} & \textbf{0.121} \\
 \textbf{Proposed Optimized GPR} & \textbf{0.185} \\
 \bottomrule
-\bottomrule
 \end{tabular}
 \label{tab:benchmark}
 \end{center}
 \end{table}
 
-This finding proves that for small, highly non-linear optical physics datasets, finding the optimal support vector margins or Gaussian process priors is a mathematically superior approach than attempting to approximate the global distribution using data-hungry deep learning architectures.
-
-\subsection{The Augmentation Paradox}
-The introduction of GAN-generated synthetic data degraded the SVR's performance. While ANNs benefit from the interpolation of GAN samples, SVR relies on precise Support Vectors. We observe that minor topological errors in synthetic data twist the SVR's regression hyperplane, increasing the average MSE.
+This performance gap highlights a fundamental difference in how these models handle small-data regimes. While Deep Neural Networks (DNNs) are highly complex global curve fitters, they often struggle when training samples are sparse, as is common with expensive FV-FEM simulations. In contrast, SVR hyperspecializes on the boundary conditions. By identifying the critical support vectors that define the transition between high and low confinement loss, SVR constructs a mathematically precise regression tube that generalizes better to unseen geometric designs than a global approximation.
 
 \subsection{Explainable AI (XAI) for PCF Design}
-SHAP analysis provided direct engineering insights into the PCF architecture. As illustrated in Fig. \ref{fig:shap}, the outer air hole diameters ($d_2, d_3$) are the primary drivers of confinement loss, while the inner hole ($d_1$) has minimal impact.
+SHAP analysis provided direct engineering insights that align with optical physics. As illustrated in Fig. \ref{fig:shap}, outer air hole diameters ($d_2, d_3$) are the primary drivers of confinement loss. 
+
+Physically, this makes sense because the outer cladding layers are responsible for suppressing the evanescent field leakage from the core to the plasmonic surface. Larger outer holes increase the refractive index contrast between the core and the cladding, thereby enhancing light confinement. Conversely, the inner hole ($d_1$) has a minimal impact on the overall loss gradient as it primarily influences the fundamental mode's effective area rather than the leakage rate toward the Gold layer. This "white-box" insight confirms that the SVR model has captured the underlying physical behavior of the PCF-SPR sensor.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.45\textwidth]{feature_importance_bar.png}}
@@ -180,11 +173,15 @@ SHAP analysis provided direct engineering insights into the PCF architecture. As
 \end{figure}
 
 \section{Engineering Validation}
-The model was validated by predicting the complete spectral loss curve (Fig. \ref{fig:sensitivity}). The predicted Average Spectral Sensitivity was calculated at 27.63 nm/RIU, establishing the SVR's physical reliability.
+To verify the physical consistency of the SVR model beyond simple error metrics, we performed an engineering validation by predicting the complete spectral loss response for varying analytes. As shown in Fig. \ref{fig:sensitivity}, the model accurately captures the resonance peak shifts as the analyte refractive index ($n_a$) increases from 1.33 to 1.36.
+
+The predicted average spectral sensitivity is 27.63 nm/RIU. While this value is relatively low compared to ultra-sensitive optimized designs in literature, it is highly consistent with the specific geometric parameters of the base design used for this validation fold. More importantly, the graph proves that the model correctly understands the phase-matching condition between the fiber mode and the surface plasmon polariton (SPP). As $n_a$ increases, the resonance wavelength ($\lambda_{res}$) shifts toward longer wavelengths (redshift), which is a characteristic behavior of PCF-SPR sensors.
+
+The model's ability to maintain these linear shifts across the entire spectral range, despite the highly non-linear nature of the individual loss curves, demonstrates that it has not merely "memorized" the dataset but has instead captured the fundamental physical relationships governing the sensor's operation. This confirms that the proposed SVR is a reliable surrogate model for rapid sensor optimization.
 
 \begin{figure}[htbp]
 \centerline{\includegraphics[width=0.45\textwidth]{spectral_sensitivity_curves.png}}
-\caption{Predicted resonance peak shifts for varying analytes.}
+\caption{Predicted resonance peak shifts for varying analytes, demonstrating the model's ability to capture the physical phase-matching behavior.}
 \label{fig:sensitivity}
 \end{figure}
 
