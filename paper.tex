@@ -23,8 +23,8 @@
 \IEEEpubid{\makebox[\columnwidth]{979-8-3503-8896-1/24/\$31.00~\copyright~2024 IEEE\hfill} 
 	\hspace{\columnsep}\makebox[\columnwidth]{}}
 
-\title{FKF-YPR Sensör Modellemesinin Yeniden Düşünülmesi: Destek Vektör Regresyonu ile Yüksek Verimli Hapsedilme Kaybı Tahmini\\
-	Rethinking PCF-SPR Sensor Modeling: High-Efficiency Confinement Loss Prediction via Support Vector Regression}
+\title{Destek Vektör Regresyonu ile Yüksek Verimli Hapsedilme Kaybı Tahmini\\
+	High-Efficiency Confinement Loss Prediction via Support Vector Regression}
 
 \author{\IEEEauthorblockN{Mohammad Hmoud and Cem Kalyoncu}
 	\IEEEauthorblockA{Department of Computer Engineering \\
@@ -50,7 +50,7 @@ Fotonik kristal fiber; yüzey plazmon rezonans; destek vektör regresyonu; açı
 \end{IEEEanahtar}
 
 \begin{abstract}
-The design and optimization of Photonic Crystal Fiber based Surface Plasmon Resonance (PCF-SPR) sensors heavily rely on full vectorial finite element method (FV-FEM) simulations, which are highly accurate but computationally expensive. Recent literature has proposed using Deep Neural Networks (DNNs) paired with Generative Adversarial Networks (GANs) to bypass simulator bottlenecks. While effective, these deep learning pipelines are computationally heavy and data-hungry. In this paper, we propose a highly optimized, lightweight Support Vector Regression (SVR) model to predict PCF-SPR confinement loss. Using a static 7-1-1 configuration split, our optimized SVR and GPR models achieved Mean Squared Errors (MSE) of 0.121 and 0.185 respectively. These results significantly outperform the state-of-the-art GAN-augmented neural network (MSE 0.314) reported in literature. Finally, we apply SHAP (SHapley Additive exPlanations) to identify outer cladding parameters as primary confinement drivers, and successfully validate the model by predicting an average spectral sensitivity of 27.63 nm/RIU.
+The design and optimization of Photonic Crystal Fiber based Surface Plasmon Resonance (PCF-SPR) sensors heavily rely on full vectorial finite element method (FV-FEM) simulations, which are highly accurate but computationally expensive. Recent literature has proposed using Deep Neural Networks (DNNs) paired with Generative Adversarial Networks (GANs) to bypass simulator bottlenecks. While effective, these deep learning pipelines are computationally heavy and requires a large number of training samples. In this paper, we propose a highly optimized, lightweight Support Vector Regression (SVR) model to predict PCF-SPR confinement loss. Using a 9-fold testing strategy, our optimized SVR and GPR models achieved Mean Squared Errors (MSE) of 0.121 and 0.185 respectively. These results significantly outperform the state-of-the-art GAN-augmented neural network (MSE 0.314) reported in literature. Finally, we apply SHAP (SHapley Additive exPlanations) to identify outer cladding parameters as primary confinement drivers, and successfully validate the model by predicting an average spectral sensitivity of 27.63 nm/RIU.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -66,7 +66,7 @@ Photonic Crystal Fibers (PCFs) are at the forefront of modern optical sensing du
 
 The traditional method for optimizing PCF-SPR cross-sections involves solving Maxwell's equations using the full vectorial finite element method (FV-FEM). While FV-FEM provides precise measurements of confinement loss and resonance peaks, it is computationally prohibitive, making the iterative search for optimal fiber geometries incredibly slow.
 
-To address this, Machine Learning (ML) has emerged as a powerful surrogate modeling tool. Chugh et al. \cite{b2} pioneered the use of Artificial Neural Networks (ANNs) to compute optical properties of PCFs, demonstrating significant speedups over numerical simulators. However, deep learning models are notoriously data-hungry. Zelaci et al. \cite{b1} addressed this by introducing Generative Adversarial Networks (WGAN-GP) to synthesize thousands of artificial training samples, driving the predictive Mean Squared Error (MSE) down to 0.314. While effective, this GAN-ANN pipeline adds complexity and potential synthetic bias.
+To address this, Machine Learning (ML) has emerged as a powerful surrogate modeling tool. Chugh et al. \cite{b2} pioneered the use of Artificial Neural Networks (ANNs) to compute optical properties of PCFs, demonstrating significant speedups over numerical simulators. However, deep learning models typically require substantial training datasets. Zelaci et al. \cite{b1} addressed this by introducing Generative Adversarial Networks (WGAN-GP) to synthesize artificial training samples, driving the predictive Mean Squared Error (MSE) down to 0.314.
 
 More recently, researchers have focused on the interpretability of these models. Khatun and Islam \cite{b3} utilized explainable AI (XAI) via SHAP values to optimize high-sensitivity biosensors, identifying critical design parameters such as gold thickness and analyte refractive index. Other traditional techniques, such as k-nearest neighbor regression, have also been explored for bent fiber modeling \cite{b4}.
 
@@ -74,7 +74,7 @@ In this work, we hypothesize that the problem space of PCF-SPR confinement loss 
 
 \section{Numerical Modeling and Dataset Generation}
 
-To construct the required dataset, numerical investigations of the proposed sensor structure were performed utilizing the COMSOL Multiphysics software. Utilizing Perfectly Matched Layers (PMLs), the Full Vectorial Finite Element Method (FV-FEM) was the primary tool employed for these simulations. Illustrated in Fig. \ref{Fig:cross_section} is the cross-section of the proposed structure; as depicted, the sensor comprises an analyte channel acting as the sensing medium, a plasmonic Gold (Au) layer, and cladding air holes of various dimensions. Arranged in a hexagonal lattice on a silica background, nineteen varied air holes form the cladding region. For this geometric setup, the radius of each hole was defined as $r_1= 0.225\,\mu\text{m}$, $r_2= 0.375\,\mu\text{m}$, $r_3 = 0.175\,\mu\text{m}$, and $r_c = 0.075\,\mu\text{m}$, while the pitch ($\Lambda$) remained fixed at $2\,\mu\text{m}$.
+To construct the required dataset, numerical investigations of the proposed sensor structure were performed utilizing the COMSOL Multiphysics software. Utilizing Perfectly Matched Layers (PMLs), the Full Vectorial Finite Element Method (FV-FEM) was the primary tool employed for these simulations. Illustrated in Fig. \ref{Fig:cross_section} is the cross-section of the proposed structure; as depicted, the sensor comprises an analyte channel acting as the sensing medium, a plasmonic Gold (Au) layer, and cladding air holes of various dimensions. Arranged in a hexagonal lattice on a silica background, nineteen varied air holes form the cladding region. The radius of each hole was defined as $r_1= 0.225\,\mu\text{m}$, $r_2= 0.375\,\mu\text{m}$, $r_3 = 0.175\,\mu\text{m}$, and $r_c = 0.075\,\mu\text{m}$, while the pitch ($\Lambda$) remained fixed at $2\,\mu\text{m}$.
 
 \begin{figure}[htbp]
 	\centering
@@ -83,7 +83,7 @@ To construct the required dataset, numerical investigations of the proposed sens
 	\label{Fig:cross_section}
 \end{figure}
 
-Light is effectively confined within the core region during the fundamental mode propagation. However, a specific fraction of light must leak toward the plasmonic layer to satisfy the conditions for resonance phase-matching, where the sensitivity measurement occurs. In this context, the light guidance is controlled by the various sized cladding holes, where each set of holes uniquely influences the sensor’s propagation characteristics. The Gold (Au) material, serving as the plasmonic layer, was set to a thickness of $40\,\text{nm}$, with permittivity values sourced from the Johnson and Christy data. To determine the refractive index of the silica material, the Sellmeier Equation was applied \cite{b5}:
+Light is effectively confined within the core region during the fundamental mode propagation. However, a specific fraction of light must leak toward the plasmonic layer to satisfy the conditions for resonance phase-matching, where the sensitivity measurement occurs. In this context, the light guidance is controlled by the various sized cladding holes, where each set of holes uniquely influences the sensor’s propagation characteristics. The Gold (Au) material, serving as the plasmonic layer, was set to a thickness of $40\,\text{nm}$, with permittivity values sourced from the Johnson and Christy data \cite{b6}. To determine the refractive index of the silica material, the Sellmeier Equation was applied \cite{b5}:
 
 \begin{equation}
 	n^2(\lambda) = 1 + \frac{B_1\lambda^2}{\lambda^2 - C_1} + \frac{B_2\lambda^2}{\lambda^2 - C_2} + \frac{B_3\lambda^2}{\lambda^2 - C_3}
@@ -100,12 +100,12 @@ where $\lambda$ represents the operating wavelength, $n$ is the Refractive Index
 where $\text{Im}(n_{eff})$ denotes the imaginary part of the effective RI. 
 
 \section{Methodology}
-In this section, we detail the data preparation pipeline and the mathematical foundations of the regression models employed in this study. Given the high-fidelity nature of the FV-FEM simulations, the methodology focuses on maintaining physical consistency while maximizing predictive accuracy in a small-data regime.
+In this section, we detail the data preparation pipeline and the mathematical foundations of the regression models employed in this study. In this study, the same dataset used in \cite{b1} is employed. Given the high-fidelity nature of the FV-FEM simulations, the methodology focuses on maintaining physical consistency while maximizing predictive accuracy in a small-data regime.
 
 \subsection{Dataset and Preprocessing}
 The FV-FEM numerical analysis provided a labeled dataset containing 432 samples. The input feature space comprises six physical variables: Analyte Refractive Index ($n_{analyte}$), Operating Wavelength ($\lambda$), Pitch ($\Lambda$), and three distinct air hole diameters ($d_1, d_2, d_3$). Across nine different geometric configurations, losses were calculated for three distinct analytes: Water ($n = 1.33$), Ethanol ($n = 1.35$), and commercial hydrocarbon mixtures ($n = 1.36$).
 
-To ensure rigorous comparison with existing literature, the model was evaluated using a static 7-1-1 split based on geometric configurations. The 432 samples were divided into 9 discrete geometric designs. Designs 1 through 7 were used for training, Design 8 for validation, and Design 9 was reserved as the final unseen test set.
+To ensure rigorous comparison with existing literature, the model was evaluated using the same static 7-1-1 split based on geometric configurations as described in \cite{b1}. The 432 samples were divided into 9 discrete geometric designs. Designs 1 through 7 were used for training, Design 8 for validation, and Design 9 was reserved as the final unseen test set.
 
 To match the non-linear resonance peaks inherent to SPR and maintain numerical stability, the confinement loss was scaled using a base-10 logarithmic transformation: $y = \log_{10}(\text{loss} \times 10^8)$. All input features were scaled using Min-Max Scaling to strict $[0, 1]$ bounds to perfectly preserve the physical limits of the fiber geometry.
 
@@ -159,7 +159,7 @@ GAN-Augmented DNN (Zelaci et al. \cite{b1}) & 0.314 \\
 \end{center}
 \end{table}
 
-This performance gap highlights a fundamental difference in how these models handle small-data regimes. While Deep Neural Networks (DNNs) are highly complex global curve fitters, they often struggle when training samples are sparse, as is common with expensive FV-FEM simulations. In contrast, SVR hyperspecializes on the boundary conditions. By identifying the critical support vectors that define the transition between high and low confinement loss, SVR constructs a mathematically precise regression tube that generalizes better to unseen geometric designs than a global approximation.
+This performance gap highlights a fundamental difference in how these models handle limited training data. While Deep Neural Networks (DNNs) are highly complex global curve fitters, they often struggle when training samples are sparse, as is common with expensive FV-FEM simulations. In contrast, SVR hyperspecializes on the boundary conditions. By identifying the critical support vectors that define the transition between high and low confinement loss, SVR constructs a mathematically precise regression tube that generalizes better to unseen geometric designs than a global approximation.
 
 \subsection{Explainable AI (XAI) for PCF Design}
 SHAP analysis provided direct engineering insights that align with optical physics. As illustrated in Fig. \ref{fig:shap}, outer air hole diameters ($d_2, d_3$) are the primary drivers of confinement loss. 
@@ -186,14 +186,15 @@ The model's ability to maintain these linear shifts across the entire spectral r
 \end{figure}
 
 \section{Conclusion}
-This study proves that optimized SVR (MSE 0.121) and GPR (MSE 0.185) models provide a more accurate and stable alternative to deep learning for PCF-SPR sensor design. By strictly following the 7-1-1 configuration split used in literature, we demonstrate that traditional machine learning techniques can outperform GAN-augmented pipelines while requiring zero synthetic data generation.
+This study suggests that optimized SVR (MSE 0.121) and GPR (MSE 0.185) models provide a more accurate alternative to deep learning for PCF-SPR sensor design. By strictly following the 7-1-1 configuration split used in literature, we demonstrate that traditional machine learning techniques can outperform GAN-augmented pipelines while requiring zero synthetic data generation.
 
 \begin{thebibliography}{00}
-\bibitem{b1} A. Zelaci, A. Yasli, C. Kalyoncu, and H. Ademgil, ``Generative Adversarial Neural Networks Model of Photonic Crystal Fiber Based Surface Plasmon Resonance Sensor,'' \textit{J. Lightwave Technol.}, vol. 39, no. 5, pp. 1515--1522, 2021.
 \bibitem{b2} S. Chugh, A. Gulistan, S. Ghosh, and B. M. A. Rahman, ``Machine learning approach for computing optical properties of a photonic crystal fiber,'' \textit{Optics Express}, vol. 27, no. 25, pp. 36414--36425, 2019.
+\bibitem{b1} A. Zelaci, A. Yasli, C. Kalyoncu, and H. Ademgil, ``Generative Adversarial Neural Networks Model of Photonic Crystal Fiber Based Surface Plasmon Resonance Sensor,'' \textit{J. Lightwave Technol.}, vol. 39, no. 5, pp. 1515--1522, 2021.
 \bibitem{b3} M. R. Khatun and M. S. Islam, ``Design optimization of high-sensitivity PCF-SPR biosensor using machine learning and explainable AI,'' \textit{PLOS ONE}, vol. 20, no. 9, p. e0330944, 2025.
 \bibitem{b4} Y. Kizilkaya and C. Kalyoncu, ``Determination of confinement loss characteristics of bent photonic crystal fibers using k-nearest neighbor regression,'' \textit{Laser Phys.}, vol. 32, no. 4, p. 045203, 2022.
 \bibitem{b5} A. A. Rifat et al., ``Photonic crystal fiber based plasmonic sensors,'' \textit{Sensors and Actuators B: Chemical}, vol. 243, pp. 311--325, 2017.
+\bibitem{b6} P. B. Johnson and R. W. Christy, ``Optical Constants of the Noble Metals,'' \textit{Phys. Rev. B}, vol. 6, no. 12, pp. 4370--4379, 1972.
 \end{thebibliography}
 
 \end{document}

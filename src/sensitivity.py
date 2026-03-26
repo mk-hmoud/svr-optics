@@ -64,6 +64,10 @@ def calculate_spectral_sensitivity():
         peak_wavelengths.append(peak_wl)
         
         plt.plot(wavelengths, preds, label=f'Analyte RI = {analyte}')
+        # Add markers at sparse intervals for better visibility
+        plt.scatter(wavelengths[::50], preds[::50], marker='o', s=20)
+        # Mark the actual peak with a cross
+        plt.scatter([peak_wl], [preds[peak_idx]], marker='x', color='red', s=100, zorder=5)
         plt.axvline(x=peak_wl, linestyle='--', alpha=0.5)
         
         print(f"Analyte {analyte} RIU | Predicted Resonance Peak: {peak_wl:.4f} nm")

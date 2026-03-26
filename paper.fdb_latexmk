@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1774463942.14339 "/mnt/extra/projects/svn-optics/paper.tex" "paper.pdf" "paper" 1774463942.51469 0
-  "/mnt/extra/projects/svn-optics/paper.tex" 1774436357.16302 18050 094540d033bdedcc38cdc22eb42f54fe ""
+["pdflatex"] 1774467793.57873 "/mnt/extra/projects/svn-optics/paper.tex" "paper.pdf" "paper" 1774467794.16086 0
+  "/mnt/extra/projects/svn-optics/paper.tex" 1774466341.35713 18127 7d51e2006650b792318503c54868776f ""
   "/usr/share/texlive/texmf-dist/fonts/enc/dvips/base/8r.enc" 1721433600 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb7t.tfm" 1136768653 2172 fd0c924230362ff848a33632ed45dc23 ""
   "/usr/share/texlive/texmf-dist/fonts/tfm/adobe/times/ptmb8r.tfm" 1136768653 4524 6bce29db5bc272ba5f332261583fee9c ""
@@ -81,9 +81,9 @@
   "Figx.png" 1774298722.12298 107927 69cb7d2aa6d03bc245caf9f4efb194a8 ""
   "IEEEtran.cls" 1774298251.76236 208608 3f71944022529a4c998f06c6b3b482bd ""
   "feature_importance_bar.png" 1773223668.44163 29962 a8fcbd78e07f1e25614beb7acc4907c5 ""
-  "paper.aux" 1774463942.4606 2692 11f829c2881f4f912a72fddf32b7e271 "pdflatex"
-  "paper.tex" 1774436357.16302 18050 094540d033bdedcc38cdc22eb42f54fe ""
-  "spectral_sensitivity_curves.png" 1773224204.74366 74066 99354e547d1a990a0268511b3bbfa667 ""
+  "paper.aux" 1774467794.0867 2750 1e5da57ce5c362a094d5796ae0ced5e3 "pdflatex"
+  "paper.tex" 1774466341.35713 18127 7d51e2006650b792318503c54868776f ""
+  "spectral_sensitivity_curves.png" 1774467792.5747 76332 f6ccd685ba11ac4dac860e01cb2df18f ""
   (generated)
   "paper.aux"
   "paper.log"
