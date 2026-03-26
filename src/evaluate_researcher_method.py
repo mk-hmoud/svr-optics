@@ -1,4 +1,8 @@
 import os
+# Force CPU only - MUST BE SET BEFORE ANY TENSORFLOW IMPORTS
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_squared_error
@@ -9,16 +13,12 @@ from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C, WhiteKern
 import tensorflow as tf
 from tensorflow.keras import layers, models, callbacks
 
-# Force CPU only
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
 def main():
     # 1. Load Data
     df = pd.read_excel('data/data.xlsx')
     
     # 2. Features and Target
-    feature_cols = ['Analyte', 'Re(eff)', 'lambda', 'Pitch (um)', 'd1 (um)', 'd2 (um)', 'd3 (um)']
+    feature_cols = ['Analyte', 'lambda', 'Pitch (um)', 'd1 (um)', 'd2 (um)', 'd3 (um)']
     X = df[feature_cols]
     
     # 3. Target Transformation: y = np.log10(np.clip(loss * 10**8, a_min=1e-10, a_max=None))
@@ -55,8 +55,21 @@ def main():
     X_val_scaled = scaler.transform(X_val_raw)
     X_test_scaled = scaler.transform(X_test_raw)
 
-    results = {'ANN': [], 'SVR': [], 'GPR': []}
-    num_runs = 10
+    # Load Researcher Synthetic Data for Augmentation
+    from src.data_augmentation import load_researcher_data
+    # Use the same feature columns but we need to ensure they are scaled consistently
+    X_res, y_res = load_researcher_data('data/gen_data.txt', feature_columns=X.columns)
+    if X_res is not None:
+        X_train_aug_raw = pd.concat([X_train_raw, X_res], ignore_index=True)
+        y_train_aug = pd.concat([y_train, y_res], ignore_index=True)
+        X_train_aug_scaled = scaler.transform(X_train_aug_raw)
+        print(f"Loaded {len(X_res)} synthetic samples for GAN-augmented runs.")
+    else:
+        print("Warning: Researcher synthetic data not found. GAN-augmented runs will be skipped.")
+        X_train_aug_scaled = None
+
+    results = {'ANN': [], 'SVR': [], 'GPR': [], 'SVR_GAN': [], 'GPR_GAN': []}
+    num_runs = 1
 
     print(f"Starting {num_runs} robust runs of Researcher Methodology (7-1-1 Split)...")
 
@@ -64,6 +77,7 @@ def main():
         print(f"Run {i+1}/{num_runs}...")
         
         # --- ANN (No Scaling) ---
+        print("  Training ANN...")
         model_ann = models.Sequential([
             layers.Input(shape=(X_train_raw.shape[1],)),
             layers.Dense(64, activation='relu'),
@@ -83,18 +97,36 @@ def main():
         results['ANN'].append(mse_ann)
 
         # --- SVR (Scaled) ---
-        # SVR is deterministic, but we run it for consistency
+        print("  Training SVR...")
         svr = SVR(kernel='rbf', C=100, gamma=0.1, epsilon=0.01)
         svr.fit(X_train_scaled, y_train)
         mse_svr = mean_squared_error(y_test, svr.predict(X_test_scaled))
         results['SVR'].append(mse_svr)
 
         # --- GPR (Scaled, Fixed) ---
+        print("  Training GPR...")
         kernel = C(1.0, (1e-3, 1e3)) * RBF(1.0, (1e-2, 1e2)) + WhiteKernel(noise_level=1e-5, noise_level_bounds=(1e-10, 1e+1))
-        gpr = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=0.0)
+        gpr = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=2, alpha=0.0)
         gpr.fit(X_train_scaled, y_train)
         mse_gpr = mean_squared_error(y_test, gpr.predict(X_test_scaled))
         results['GPR'].append(mse_gpr)
+
+        # --- SVR + GAN ---
+        print("  Training SVR + GAN...")
+        if X_train_aug_scaled is not None:
+            svr_gan = SVR(kernel='rbf', C=100, gamma=0.1, epsilon=0.01)
+            svr_gan.fit(X_train_aug_scaled, y_train_aug)
+            mse_svr_gan = mean_squared_error(y_test, svr_gan.predict(X_test_scaled))
+            results['SVR_GAN'].append(mse_svr_gan)
+
+        # --- GPR + GAN ---
+        print("  Training GPR + GAN...")
+        if X_train_aug_scaled is not None:
+            # GPR is O(N^3), 5000 points might be slow. Reducing restarts.
+            gpr_gan = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=0, alpha=0.0)
+            gpr_gan.fit(X_train_aug_scaled, y_train_aug)
+            mse_gpr_gan = mean_squared_error(y_test, gpr_gan.predict(X_test_scaled))
+            results['GPR_GAN'].append(mse_gpr_gan)
         
         tf.keras.backend.clear_session()
 
@@ -105,9 +137,10 @@ def main():
     print(f"{'Model':<10} | {'Avg MSE':<12} | {'Std Dev':<10}")
     print("-" * 40)
     for model_name, mses in results.items():
-        avg_mse = np.mean(mses)
-        std_mse = np.std(mses)
-        print(f"{model_name:<10} | {avg_mse:<12.6f} | {std_mse:<10.6f}")
+        if mses:
+            avg_mse = np.mean(mses)
+            std_mse = np.std(mses)
+            print(f"{model_name:<10} | {avg_mse:<12.6f} | {std_mse:<10.6f}")
     print("="*40)
 
 if __name__ == "__main__":

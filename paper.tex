@@ -153,6 +153,8 @@ Baseline DNN (Zelaci et al. \cite{b1}) & 0.894 \\
 GAN-Augmented DNN (Zelaci et al. \cite{b1}) & 0.314 \\
 \textbf{Proposed Optimized SVR} & \textbf{0.121} \\
 \textbf{Proposed Optimized GPR} & \textbf{0.185} \\
+Proposed SVR + GAN & 0.197 \\
+Proposed GPR + GAN & 23.844 \\
 \bottomrule
 \end{tabular}
 \label{tab:benchmark}
@@ -160,6 +162,11 @@ GAN-Augmented DNN (Zelaci et al. \cite{b1}) & 0.314 \\
 \end{table}
 
 This performance gap highlights a fundamental difference in how these models handle limited training data. While Deep Neural Networks (DNNs) are highly complex global curve fitters, they often struggle when training samples are sparse, as is common with expensive FV-FEM simulations. In contrast, SVR hyperspecializes on the boundary conditions. By identifying the critical support vectors that define the transition between high and low confinement loss, SVR constructs a mathematically precise regression tube that generalizes better to unseen geometric designs than a global approximation.
+
+\subsection{Impact of GAN-Augmentation on Traditional Regressors}
+To investigate the "Performance Boost" claim of GAN-augmentation in the context of traditional ML, we implemented the exact WGAN-GP architecture described in \cite{b1} and applied it to our SVR and GPR models. As seen in Table \ref{tab:benchmark}, the inclusion of synthetic data significantly degraded performance for both models. 
+
+The SVR MSE increased from 0.121 to 0.197, while the GPR model suffered a catastrophic failure with an MSE of 23.844. This suggests that while GANs can "fill the gaps" for data-hungry neural networks, they introduce non-physical noise and distribution shifts that violate the rigorous mathematical assumptions of kernel-based regressors. Specifically, GPR's reliance on a smooth covariance matrix is highly sensitive to the low-fidelity artifacts often present in GAN-generated tabular data.
 
 \subsection{Explainable AI (XAI) for PCF Design}
 SHAP analysis provided direct engineering insights that align with optical physics. As illustrated in Fig. \ref{fig:shap}, outer air hole diameters ($d_2, d_3$) are the primary drivers of confinement loss. 
