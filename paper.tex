@@ -1,4 +1,4 @@
-\documentclass[conference,draft]{IEEEtran}
+\documentclass[conference]{IEEEtran}
 
 \IEEEoverridecommandlockouts
 
@@ -50,7 +50,7 @@ Fotonik kristal fiber; yüzey plazmon rezonans; destek vektör regresyonu; açı
 \end{IEEEanahtar}
 
 \begin{abstract}
-The design and optimization of Photonic Crystal Fiber based Surface Plasmon Resonance (PCF-SPR) sensors heavily rely on full vectorial finite element method (FV-FEM) simulations, which are highly accurate but computationally expensive. Recent literature has proposed using Deep Neural Networks (DNNs) paired with Generative Adversarial Networks (GANs) to bypass simulator bottlenecks. While effective, these deep learning pipelines are computationally heavy and requires a large number of training samples. In this paper, we propose a highly optimized, lightweight Support Vector Regression (SVR) model to predict PCF-SPR confinement loss. Using a 9-fold testing strategy, our optimized SVR and GPR models achieved Mean Squared Errors (MSE) of 0.121 and 0.185 respectively. These results significantly outperform the state-of-the-art GAN-augmented neural network (MSE 0.314) reported in literature. Finally, we apply SHAP (SHapley Additive exPlanations) to identify outer cladding parameters as primary confinement drivers, and successfully validate the model by predicting an average spectral sensitivity of 27.63 nm/RIU.
+The design and optimization of Photonic Crystal Fiber based Surface Plasmon Resonance (PCF-SPR) sensors heavily rely on full vectorial finite element method (FV-FEM) simulations, which are highly accurate but computationally expensive. Recent literature has proposed using Deep Neural Networks (DNNs) paired with Generative Adversarial Networks (GANs) to bypass simulator bottlenecks. While effective, these deep learning pipelines are computationally heavy and requires a large number of training samples. In this paper, we propose a highly optimized, lightweight Support Vector Regression (SVR) model to predict PCF-SPR confinement loss. Using a 9-fold testing strategy, our optimized SVR and GPR models achieved Mean Squared Errors (MSE) of 0.121 and 0.185 respectively. These results significantly outperform the state-of-the-art GAN-augmented neural network (MSE 0.314) reported in literature. Finally, we apply SHAP (SHapley Additive exPlanations) to identify outer cladding parameters as primary confinement drivers, and evaluate manufacturing robustness via Monte Carlo simulations. The results reveal the sensor's pitch as the primary volatility driver, inducing a 1.23 nm spectral jitter at 3\% manufacturing tolerance. Finally, we validate the model by predicting an average spectral sensitivity of 27.63 nm/RIU.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -78,7 +78,7 @@ By applying proper feature scaling, we demonstrate that these lightweight tradit
 
 Finally, to ensure the proposed model is practically useful for optical optimization, we apply SHAP (SHapley Additive exPlanations) analysis. Rather than treating the ML pipeline as a ``black box,'' SHAP deconstructs the regression outputs by isolating the marginal contribution of each physical feature. This explicitly reveals how and why specific geometric parameters (such as the outer cladding air holes) drive evanescent field leakage.
 
-The remainder of this paper is organized as follows: Section II describes the numerical modeling and dataset generation for the PCF-SPR sensor. Section III presents the proposed methodology, including the mathematical foundations of SVR and GPR. Section IV discusses the predictive performance results and benchmarks against existing deep learning models. Section V provides the engineering validation using SHAP values. Finally, Section VI concludes the paper.
+The remainder of this paper is organized as follows: Section II describes the numerical modeling and dataset generation for the PCF-SPR sensor. Section III presents the proposed methodology, including the mathematical foundations of SVR and GPR. Section IV discusses the predictive performance results, benchmarks against existing deep learning models, and evaluates manufacturing robustness. Section V provides the engineering validation using SHAP values. Finally, Section VI concludes the paper.
 
 \section{Numerical Modeling and Dataset Generation}
 
@@ -149,6 +149,11 @@ where $K$ is the training covariance matrix and $K_*$ is the train-test covarian
 
 \subsection{Predictive Performance: SVR vs. Deep Learning}
 The optimized SVR and GPR models demonstrated exceptional predictive capabilities under the exact testing methodology used in previous literature. As shown in Table \ref{tab:benchmark}, our lightweight traditional models achieved superior accuracy without the need for complex data augmentation.
+
+\subsection{Manufacturing Tolerance and Robustness Analysis}
+A critical challenge in PCF-SPR sensor fabrication is the precision of geometric parameters during the fiber drawing process. To evaluate the practical reliability of the proposed SVR model, we performed a Monte Carlo robustness analysis by introducing Gaussian noise ($\sigma = 1\%, 3\%, 5\%$) to the geometric features (Pitch, $d_1, d_2, d_3$). 
+
+Our simulations reveal that the resonance peak wavelength exhibits a standard deviation (jitter) of 1.03 nm at 1\% tolerance, increasing to 1.34 nm at 5\% tolerance. Furthermore, by isolating the volatility contribution of each feature, we identified the Pitch ($\Lambda$) as the primary driver of spectral instability, accounting for over 90\% of the observed peak jitter (1.23 nm std at 3\% noise). In contrast, the small air hole diameter ($d_1$) showed remarkable stability with negligible volatility (0.01 nm). This analysis provides a "Robustness Map" for fabricators, suggesting that maintaining pitch uniformity is more critical for sensor calibration than precise control of the smallest cladding holes.
 
 \begin{table}[htbp]
 \caption{Benchmarking Proposed Models against Literature}
