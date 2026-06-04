@@ -132,13 +132,30 @@ where $K$ is the training covariance matrix and $K_*$ is the train-test covarian
 \subsection{Predictive Performance: SVR vs. Deep Learning}
 The optimized SVR and GPR models demonstrated exceptional predictive capabilities under the exact testing methodology used in previous literature. As shown in Table \ref{tab:benchmark}, our lightweight traditional models achieved superior accuracy without the need for complex data augmentation.
 
+We performed a 9-fold Leave-One-Group-Out (LOGO) cross-validation, where each fold corresponds to an entire geometric configuration ($N=48$ samples per fold) being withheld from training. This ensures that the model is tested on truly unseen fiber designs. As summarized in Table \ref{tab:cv_results}, the proposed SVR model maintains a low Average MSE of 0.246 across all configurations, significantly outperforming GAN-augmented benchmarks which exhibit a higher error of 0.825 and greater instability (Std Dev = 0.609). The relatively low standard deviation of the SVR model (0.226) confirms its robustness across diverse PCF geometries.
+
 \subsection{Manufacturing Tolerance and Robustness Analysis}
 A critical challenge in PCF-SPR sensor fabrication is the precision of geometric parameters during the fiber drawing process. To evaluate the practical reliability of the proposed SVR model, we performed a Monte Carlo robustness analysis by introducing Gaussian noise ($\sigma = 1\%, 3\%, 5\%$) to the geometric features (Pitch, $d_1, d_2, d_3$). 
 
 Our simulations reveal that the resonance peak wavelength exhibits a standard deviation (jitter) of 1.03 nm at 1\% tolerance, increasing to 1.34 nm at 5\% tolerance. Furthermore, by isolating the volatility contribution of each feature, we identified the Pitch ($\Lambda$) as the primary driver of spectral instability, accounting for over 90\% of the observed peak jitter (1.23 nm std at 3\% noise). In contrast, the small air hole diameter ($d_1$) showed remarkable stability with negligible volatility (0.01 nm). This analysis provides a "Robustness Map" for fabricators, suggesting that maintaining pitch uniformity is more critical for sensor calibration than precise control of the smallest cladding holes.
 
 \begin{table}[htbp]
-\caption{Benchmarking Proposed Models against Literature}
+\caption{9-Fold Cross-Validation Results (MSE)}
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Fold} & \textbf{Proposed SVR} & \textbf{GAN-Augmented} \\
+\midrule
+Average & 0.246 & 0.825 \\
+Std. Dev. & 0.226 & 0.609 \\
+\bottomrule
+\end{tabular}
+\label{tab:cv_results}
+\end{center}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Benchmarking Proposed Models against Literature (Single Fold)}
 \begin{center}
 \begin{tabular}{lc}
 \toprule
