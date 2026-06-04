@@ -56,11 +56,11 @@ Photonic Crystal Fibers (PCFs) coated with plasmonic materials form highly sensi
 
 Machine Learning (ML) has emerged as a surrogate modeling alternative to address this bottleneck. Chugh et al. \cite{b2} pioneered the use of Artificial Neural Networks (ANNs) to accelerate PCF computations, but such deep learning models require large training datasets. Zelaci et al. \cite{b1} addressed this by using a Wasserstein Generative Adversarial Network with Gradient Penalty (WGAN-GP) to synthesize training samples, achieving a Mean Squared Error (MSE) of 0.314. Additionally, interpretability techniques like SHapley Additive exPlanations (SHAP) have been applied to identify critical parameters like gold thickness \cite{b3}, alongside traditional models like k-nearest neighbor regression for bent fibers \cite{b4}.
 
-We hypothesize that PCF-SPR confinement loss, characterized by sharp non-linear resonances and inherently small datasets ($N < 500$), is better suited for boundary-focused algorithms rather than deep learning. This hypothesis is supported by recent findings in Kaium and Mollah \cite{b8} and Opoku et al. \cite{b9}, which validate the efficiency and precision of Gaussian Process Regression (GPR) and Support Vector Regression (SVR) over traditional Artificial Neural Networks (ANNs) when dealing with limited datasets. We evaluate Bayesian-optimized Support Vector Regression (SVR) and Gaussian Process Regression (GPR) against the GAN-ANN baseline. SVR builds regression margins based exclusively on extreme boundary cases, while GPR maps mathematical covariance without overfitting. We demonstrate that these lightweight models significantly outperform augmented Deep Neural Network (DNN) benchmarks without requiring synthetic data. Furthermore, we empirically prove an ``Augmentation Paradox'': microscopic numerical noise in GAN-generated data warps the SVR hyperplane and degrades GPR covariance matrices, actively harming predictive performance.
+We hypothesize that PCF-SPR confinement loss, with sharp non-linear resonances and small datasets ($N < 500$), is better suited for boundary-focused algorithms like SVR and GPR rather than deep learning. This is supported by Kaium and Mollah \cite{b8} and Opoku et al. \cite{b9}, who validate the efficiency of kernel-based models over ANNs for limited fiber data. We evaluate Bayesian-optimized SVR and GPR against the GAN-ANN baseline, demonstrating that these lightweight models significantly outperform augmented DNN benchmarks. Furthermore, we empirically prove an ``Augmentation Paradox'': microscopic numerical noise in GAN-generated data actively harms predictive performance.
 
 Finally, to ensure practical utility, we apply SHAP analysis to deconstruct regression outputs and isolate the marginal contributions of each physical feature, revealing how specific parameters drive evanescent field leakage. 
 
-The remainder of this paper is organized as follows: Section II describes the numerical modeling and dataset generation. Section III presents the methodology. Section IV discusses predictive performance, benchmarks, and manufacturing robustness. Section V provides engineering validation using SHAP, and Section VI concludes the paper.
+The remainder of this paper is organized as follows: Section II describes the numerical modeling. Section III presents the methodology. Section IV discusses performance and robustness. Section V provides engineering validation, and Section VI concludes the paper.
 
 \section{Numerical Modeling and Dataset Generation}
 
@@ -68,7 +68,7 @@ To construct the required dataset, numerical investigations of the proposed sens
 
 \begin{figure}[htbp]
 	\centering
-	\includegraphics[width=.7\linewidth]{Figx}
+	\includegraphics[width=.5\linewidth]{Figx}
 	\caption{The cross-section of the proposed PCF based SPR sensor.}
 	\label{Fig:cross_section}
 \end{figure}
@@ -130,9 +130,8 @@ where $K$ is the training covariance matrix and $K_*$ is the train-test covarian
 \section{Results and Discussion}
 
 \subsection{Predictive Performance: SVR vs. Deep Learning}
-The optimized SVR and GPR models demonstrated exceptional predictive capabilities under the exact testing methodology used in previous literature. As shown in Table \ref{tab:benchmark}, our lightweight traditional models achieved superior accuracy without the need for complex data augmentation.
+SVR and GPR models achieved superior accuracy without augmentation (Table \ref{tab:benchmark}). To rigorously verify results, 9-fold LOGO cross-validation was performed. As shown in Table \ref{tab:benchmark}, SVR maintains a low Average MSE (0.246), outperforming GAN-augmented benchmarks (0.825) with higher stability (Std Dev = 0.226 vs 0.609).
 
-We performed a 9-fold Leave-One-Group-Out (LOGO) cross-validation, where each fold corresponds to an entire geometric configuration ($N=48$ samples per fold) being withheld from training. This ensures that the model is tested on truly unseen fiber designs. As summarized in Table \ref{tab:cv_results}, the proposed SVR model maintains a low Average MSE of 0.246 across all configurations, significantly outperforming GAN-augmented benchmarks which exhibit a higher error of 0.825 and greater instability (Std Dev = 0.609). The relatively low standard deviation of the SVR model (0.226) confirms its robustness across diverse PCF geometries.
 
 \subsection{Manufacturing Tolerance and Robustness Analysis}
 A critical challenge in PCF-SPR sensor fabrication is the precision of geometric parameters during the fiber drawing process. To evaluate the practical reliability of the proposed SVR model, we performed a Monte Carlo robustness analysis by introducing Gaussian noise ($\sigma = 1\%, 3\%, 5\%$) to the geometric features (Pitch, $d_1, d_2, d_3$). 
@@ -140,34 +139,17 @@ A critical challenge in PCF-SPR sensor fabrication is the precision of geometric
 Our simulations reveal that the resonance peak wavelength exhibits a standard deviation (jitter) of 1.03 nm at 1\% tolerance, increasing to 1.34 nm at 5\% tolerance. Furthermore, by isolating the volatility contribution of each feature, we identified the Pitch ($\Lambda$) as the primary driver of spectral instability, accounting for over 90\% of the observed peak jitter (1.23 nm std at 3\% noise). In contrast, the small air hole diameter ($d_1$) showed remarkable stability with negligible volatility (0.01 nm). This analysis provides a "Robustness Map" for fabricators, suggesting that maintaining pitch uniformity is more critical for sensor calibration than precise control of the smallest cladding holes.
 
 \begin{table}[htbp]
-\caption{9-Fold Cross-Validation Results (MSE)}
+\caption{Model Performance Summary (MSE)}
 \begin{center}
 \begin{tabular}{lcc}
 \toprule
-\textbf{Fold} & \textbf{Proposed SVR} & \textbf{GAN-Augmented} \\
+\textbf{Model} & \textbf{Static Split} & \textbf{9-Fold CV (Avg)} \\
 \midrule
-Average & 0.246 & 0.825 \\
-Std. Dev. & 0.226 & 0.609 \\
-\bottomrule
-\end{tabular}
-\label{tab:cv_results}
-\end{center}
-\end{table}
-
-\begin{table}[htbp]
-\caption{Benchmarking Proposed Models against Literature (Single Fold)}
-\begin{center}
-\begin{tabular}{lc}
-\toprule
-\textbf{Model} & \textbf{Avg. MSE} \\
-\midrule
-Baseline DNN (Zelaci et al. \cite{b1}) & 0.894 \\
-GAN-Augmented DNN (Zelaci et al. \cite{b1}) & 0.314 \\
-ML-Enhanced ANN (Ehyaee et al. \cite{b10}) & 0.140 \\
-\textbf{Proposed Optimized SVR} & \textbf{0.121} \\
-\textbf{Proposed Optimized GPR} & \textbf{0.185} \\
-Proposed SVR + GAN & 0.197 \\
-Proposed GPR + GAN & 52.861 \\
+Baseline DNN \cite{b1} & 0.894 & --- \\
+GAN-Augmented DNN \cite{b1} & 0.314 & 0.825 \\
+ML-Enhanced ANN \cite{b10} & 0.140 & --- \\
+\textbf{Proposed Optimized SVR} & \textbf{0.121} & \textbf{0.246} \\
+Proposed Optimized GPR & 0.185 & --- \\
 \bottomrule
 \end{tabular}
 \label{tab:benchmark}
@@ -206,27 +188,27 @@ To ensure the proposed model is practically useful for optical optimization, we 
 
 Physically, this explicitly reveals how and why specific geometric parameters drive evanescent field leakage. The outer cladding layers are responsible for suppressing the field leakage from the core to the plasmonic surface; larger outer holes increase the refractive index contrast, thereby enhancing light confinement. This providing a verifiable bridge between high-accuracy mathematical regression and true engineering intuition.
 
-\begin{figure}[htbp]
-\centerline{\includegraphics[width=0.45\textwidth]{feature_importance_bar.png}}
-\caption{Global feature importance ranking derived from SHAP values.}
-\label{fig:shap}
-\end{figure}
+\begin{figure*}[t]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{feature_importance_bar.png}
+        \caption{Global feature importance ranking derived from SHAP values.}
+        \label{fig:shap}
+    \end{minipage}\hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{spectral_sensitivity_curves.png}
+        \caption{Predicted resonance peak shifts for varying analytes.}
+        \label{fig:sensitivity}
+    \end{minipage}
+\end{figure*}
 
 \section{Engineering Validation}
-To verify the physical consistency of the SVR model beyond simple error metrics, we performed an engineering validation by predicting the complete spectral loss response for varying analytes. As shown in Fig. \ref{fig:sensitivity}, the model accurately captures the resonance peak shifts as the analyte refractive index ($n_a$) increases from 1.33 to 1.36.
-
-The predicted average spectral sensitivity is 27.63 nm/RIU (Refractive Index Unit). While this value is relatively low compared to ultra-sensitive optimized designs in literature---such as the recent high-precision dual-parameter cancer and temperature sensors proposed by Zhang et al. \cite{b11}---it is highly consistent with the specific geometric parameters of the base design used for this validation fold. More importantly, the graph proves that the model correctly understands the phase-matching condition between the fiber mode and the surface plasmon polariton (SPP). As $n_a$ increases, the resonance wavelength ($\lambda_{res}$) shifts toward longer wavelengths (redshift), which is a characteristic behavior of PCF-SPR sensors.
-
-The model's ability to maintain these linear shifts across the entire spectral range, despite the highly non-linear nature of the individual loss curves, demonstrates that it has not merely "memorized" the dataset but has instead captured the fundamental physical relationships governing the sensor's operation. This confirms that the proposed SVR is a reliable surrogate model for rapid sensor optimization.
+We predicted the complete spectral loss response for varying analytes to verify physical consistency. As shown in Fig. \ref{fig:sensitivity}, the model captures resonance peak shifts as $n_a$ increases from 1.33 to 1.36. The average sensitivity is 27.63 nm/RIU, consistent with the base design geometric parameters. This captured redshift confirms the model understands the phase-matching between the fiber mode and SPP, making it a reliable surrogate for rapid optimization.
 
 \subsection{Discussion of Limitations}
-While the proposed Bayesian-optimized SVR model demonstrates high predictive accuracy and physical consistency, this study is subject to certain limitations. Primarily, the results are grounded in numerical investigations using the FV-FEM method. Although the COMSOL simulations utilize high-fidelity boundary conditions and established material data, experimental validation involving the fabrication of the proposed PCF-SPR structure is required to confirm these findings under real-world conditions. Specifically, fabrication-induced imperfections such as surface roughness of the plasmonic Gold layer, material impurities, and slight geometric deviations beyond the modeled manufacturing tolerances may influence the sensor's absolute sensitivity and signal-to-noise ratio. Future work will focus on the experimental implementation of the optimized design to bridge the gap between numerical surrogate modeling and practical sensor deployment.
-
-\begin{figure}[htbp]
-\centerline{\includegraphics[width=0.45\textwidth]{spectral_sensitivity_curves.png}}
-\caption{Predicted resonance peak shifts for varying analytes, demonstrating the model's ability to capture the physical phase-matching behavior.}
-\label{fig:sensitivity}
-\end{figure}
+This study is grounded in numerical FV-FEM investigations. While high-fidelity, experimental validation is required to confirm findings under real-world conditions. Fabrication-induced imperfections, such as surface roughness of the Gold layer and material impurities, may influence sensitivity and SNR. Future work will focus on experimental implementation to bridge the gap between surrogate modeling and practical deployment.
 
 \section{Conclusion}
 In this work, we demonstrate that Bayesian-optimized Support Vector Regression (SVR) and Gaussian Process Regression (GPR) models significantly outperform GAN-augmented neural networks for Photonic Crystal Fiber-Surface Plasmon Resonance (PCF-SPR) sensor modeling. We empirically identify an "Augmentation Paradox," where the non-physical numerical noise inherent to GAN-generated synthetic samples actively harms the predictive performance of kernel-based models, suggesting that small-data regimes in photonics are better suited for boundary-focused algorithms than generative deep learning. 
@@ -235,6 +217,7 @@ In terms of computational efficiency, the proposed SVR model offers a significan
 
 Furthermore, by integrating SHAP analysis and Monte Carlo simulations, we move beyond "black box" modeling to provide actionable engineering insights. Our robustness analysis identifies the sensor pitch ($\Lambda$) as the primary driver of manufacturing instability, accounting for over 90\% of resonance jitter (1.23 nm at 3\% tolerance). This research underscores that high-accuracy predictive modeling, when paired with explainable AI and robustness analysis, can effectively guide the design of next-generation PCF-SPR sensors while drastically minimizing computational costs and ensuring manufacturing reliability.
 
+\small
 \begin{thebibliography}{00}
 \bibitem{b2} S. Chugh, A. Gulistan, S. Ghosh, and B. M. A. Rahman, ``Machine learning approach for computing optical properties of a photonic crystal fiber,'' \textit{Optics Express}, vol. 27, no. 25, pp. 36414--36425, 2019.
 \bibitem{b1} A. Zelaci, A. Yasli, C. Kalyoncu, and H. Ademgil, ``Generative Adversarial Neural Networks Model of Photonic Crystal Fiber Based Surface Plasmon Resonance Sensor,'' \textit{J. Lightwave Technol.}, vol. 39, no. 5, pp. 1515--1522, 2021.
