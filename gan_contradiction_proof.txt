@@ -1,0 +1,11 @@
+Empirical Proof of GPR Collapse:
+Two GAN-generated samples were found with a Euclidean distance of 0.011122 in scaled feature space.
+Sample 1 Target (Log10 Loss): 4.446579
+Sample 2 Target (Log10 Loss): 4.614393
+Target Discrepancy (Delta Y): 0.167814
+
+Feature Vectors (Scaled):
+S1: [-0.03576767  0.22039032 -0.02517566  0.00066297  0.12797374  0.07836261
+  0.00599782]
+S2: [-0.03533968  0.22438887 -0.02601517 -0.00725956  0.12850581  0.07431406
+  0.00076457]

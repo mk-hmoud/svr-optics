@@ -7,17 +7,18 @@ class Generator(nn.Module):
     def __init__(self, input_dim=8, output_dim=8):
         super(Generator, self).__init__()
         # 5 hidden layers, 128 neurons each (Table I)
+        # Use LeakyReLU to prevent dead neurons and help with gradient flow
         self.model = nn.Sequential(
             nn.Linear(input_dim, 128),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Linear(128, 128),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Linear(128, 128),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Linear(128, 128),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Linear(128, 128),
-            nn.ReLU(),
+            nn.LeakyReLU(0.2),
             nn.Linear(128, output_dim)
         )
     
@@ -109,7 +110,8 @@ def train_wgan_paper(train_data, epochs=2500, batch_size=32, n_critic=5, lr=0.00
 
 def generate_samples_paper(generator, num_samples=1000):
     generator.eval()
-    z = torch.randn(num_samples, 8)
+    # Increase latent scale to 2.0 to force the generator to explore further
+    z = torch.randn(num_samples, 8) * 2.0
     with torch.no_grad():
         samples = generator(z).numpy()
     return samples

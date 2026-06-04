@@ -1,0 +1,9 @@
+Data_Set,Config,MSE
+Real Data (No GAN),"No WK, No Alpha (alpha=0)",
+Real Data (No GAN),"With WK, With Alpha",2.1163002100345145
+Real Data (No GAN),"With WK, No Alpha (alpha=0)",0.18519289228689276
+Real Data (No GAN),"No WK, With Alpha",71.8490152291118
+Augmented (With GAN),"No WK, No Alpha (alpha=0)",
+Augmented (With GAN),"With WK, With Alpha",68.26163857232301
+Augmented (With GAN),"With WK, No Alpha (alpha=0)",69.87315469273794
+Augmented (With GAN),"No WK, With Alpha",69.87316050192048
