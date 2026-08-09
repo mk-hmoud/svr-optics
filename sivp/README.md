@@ -73,3 +73,5 @@ peak shifts (0.2793 / 0.2733, mean 0.2763) exactly.
    reports only the fixed-partition value of 23.844 from
    `results_comparison_final.csv`. Restore the 52.86 if you can locate its
    source.
+
+See scripts/verify_refs.py: run it before every submission. It checks each refs.bib entry against Crossref/OpenAlex and reports anything that does not match.

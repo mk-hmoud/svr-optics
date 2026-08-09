@@ -63,6 +63,11 @@ Kaium SMA, Mollah MA (2024) Optical properties estimation of photonic crystal
   fiber using gaussian process regression. Optics Continuum 3(8):1369--1388.
   \doi{10.1364/OPTCON.527519}
 
+\bibitem[{Kalyoncu et~al.(2022)Kalyoncu, Yasli, and Ademgil}]{kalyoncu2022}
+Kalyoncu C, Yasli A, Ademgil H (2022) Machine learning methods for estimating
+  bent photonic crystal fiber based {SPR} sensor properties. Heliyon
+  8(11):e11582. \doi{10.1016/j.heliyon.2022.e11582}
+
 \bibitem[{Kaziz et~al.(2024)Kaziz, Echouchene, and Gazzah}]{kaziz2024}
 Kaziz S, Echouchene F, Gazzah MH (2024) Optimizing {PCF-SPR} sensor design
   through {T}aguchi approach, machine learning, and genetic algorithms.
@@ -72,11 +77,6 @@ Kaziz S, Echouchene F, Gazzah MH (2024) Optimizing {PCF-SPR} sensor design
 Khatun MR, Islam MM (2025) Design optimization of high-sensitivity {PCF-SPR}
   biosensor using machine learning and explainable {AI}. PLOS ONE
   20(9):e0330944. \doi{10.1371/journal.pone.0330944}
-
-\bibitem[{Kizilkaya and Kalyoncu(2022)}]{kizilkaya2022}
-Kizilkaya Y, Kalyoncu C (2022) Determination of confinement loss
-  characteristics of bent photonic crystal fibers using k-nearest neighbor
-  regression. Laser Physics 32(4):045203
 
 \bibitem[{Lundberg and Lee(2017)}]{lundberg2017}
 Lundberg SM, Lee SI (2017) A unified approach to interpreting model
