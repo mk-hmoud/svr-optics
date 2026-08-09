@@ -168,20 +168,34 @@ against a deep network that was itself data-starved, and the comparison never
 asks whether a model suited to small data would have needed the synthetic samples
 at all.
 
+\paragraph{Design optimisation without deep networks.} A parallel line of work
+optimises PCF-SPR geometry without a deep surrogate at all. Kaziz et
+al.~\cite{kaziz2024} combined a Taguchi design of experiments with machine
+learning and a genetic algorithm; Romeiro et al.~\cite{romeiro2026} studied
+geometric optimisation of the cladding lattice directly. Goswami et
+al.~\cite{goswami2023} classified guided modes of a PCF-SPR sensor, and Fasseaux
+et al.~\cite{fasseaux2024} learned refractive-index dynamics for plasmonic fiber
+biosensors from measured rather than simulated spectra. What these share with the
+present work is the premise that the sample budget, not model capacity, is the
+binding constraint.
+
 \paragraph{Kernel methods on small optical datasets.} Kizilkaya and
 Kalyoncu~\cite{kizilkaya2022} used $k$-nearest-neighbour regression for
 confinement loss in bent PCFs. Kaium and Mollah~\cite{kaium2024} applied GPR to
 PCF property estimation, and Opoku et al.~\cite{opoku2026} benchmarked ten
 regressors on a simulated PCF-SPR sensor, with kernel and ensemble methods
-leading. These results motivate our hypothesis but stop short of testing it
-against a generative-augmentation baseline on identical data, which is what we do
-here.
+leading. Applications of the same family of sensors continue to
+broaden~\cite{shafi2026}. These results motivate our hypothesis but stop short of
+testing it against a generative-augmentation baseline on identical data, which is
+what we do here.
 
 \paragraph{Interpretability.} Khatun and Islam~\cite{khatun2025} applied Shapley
 additive explanations~\cite{lundberg2017} to a PCF-SPR design, isolating gold film
-thickness as a driver of sensitivity. We extend that style of analysis to a
-multi-family cladding lattice, where the question is not the thickness of one
-layer but which of several hole families controls leakage.
+thickness as a driver of sensitivity, and Akter and Abdullah~\cite{akter2026}
+argued for deliberately interpretable models in plasmonic sensor optimisation. We
+extend that style of analysis to a multi-family cladding lattice, where the
+question is not the thickness of one layer but which of several hole families
+controls leakage.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Sensor structure and numerical model}\label{sec:model}
@@ -565,6 +579,17 @@ The general lesson is that generative augmentation trades a data-quantity proble
 for a data-consistency one. A model that needs the quantity may accept the trade.
 A model that does not is strictly worse off.
 
+This is a physical instance of a failure the wider machine-learning literature has
+begun to document. Shumailov et al.~\cite{shumailov2024} showed that training on
+model-generated data drives progressive degradation, and Juwara et
+al.~\cite{juwara2024} found synthetic augmentation beneficial only under
+conditions that must be checked rather than assumed. Our setting differs from the
+recursive loop those studies analyse -- we augment once, from a generator trained
+on real data -- which makes the degradation here the more surprising, since a
+single generation gives error no opportunity to compound. What supplies the damage
+instead is the absence of a physical constraint: the generator is free to violate
+the single-valuedness the underlying Maxwell problem guarantees.
+
 \subsection{What the surrogate learned}\label{sec:xai}
 
 A surrogate that is accurate but opaque is of limited use in design, where the
@@ -714,18 +739,20 @@ Third, the augmentation paradox is demonstrated for one generator architecture o
 one dataset. The mechanism we identify -- a generator with no physical constraint
 emitting inconsistent near-duplicate pairs -- is not specific to WGAN-GP, and we
 expect it to affect any unconstrained generative augmentation feeding a kernel
-model. Establishing that requires testing physics-informed generators, which
-would be the natural way to obtain the data volume without the inconsistency.
+model. Establishing that requires testing generators constrained to respect the
+governing equations, which would be the natural way to obtain the data volume
+without the inconsistency, and a check on the consistency of generated samples --
+of the kind performed in Sect.~\ref{sec:paradox} -- should in our view precede
+any use of synthetic data in this setting~\cite{juwara2024}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusion}\label{sec:conclusion}
 
 We have shown that a Bayesian-optimised support vector regressor predicts PCF-SPR
 confinement loss more accurately than a GAN-augmented deep network on identical
-data -- an MSE of 0.121 against 0.314, a 61\% reduction -- while using only the
-432 original FV-FEM samples and no synthetic data at all. Under
-leave-one-geometry-out validation the advantage holds in both mean and variance,
-0.246 $\pm$ 0.226 against 0.825 $\pm$ 0.609.
+data -- a 61\% error reduction -- using only the 432 original FV-FEM samples and
+no synthetic data. Under leave-one-geometry-out validation the advantage holds in
+both mean and variance.
 
 The augmentation step that the surrogate literature has converged on is, for this
 class of model, actively harmful. Adding GAN-generated samples raises SVR error by

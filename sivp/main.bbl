@@ -1,10 +1,21 @@
-\begin{thebibliography}{15}
+\begin{thebibliography}{23}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{{#1}}
 \providecommand{\urlprefix}{URL }
 \providecommand{\doi}[1]{\url{https://doi.org/#1}}
 \providecommand{\eprint}[2][]{\url{#2}}
  \bibcommenthead
+
+\bibitem[{Abdullah-Al-Shafi et~al.(2026)Abdullah-Al-Shafi, Sen, and
+  Mubassera}]{shafi2026}
+Abdullah-Al-Shafi M, Sen S, Mubassera M (2026) Machine learning assisted
+  malaria detection using photonic crystal fibre optical sensors. Scientific
+  Reports 16(1):8320. \doi{10.1038/s41598-026-37709-2}
+
+\bibitem[{Akter and Abdullah(2026)}]{akter2026}
+Akter S, Abdullah H (2026) Machine learning-driven optimization of monolithic
+  gold plasmonic sensors: achieving ultrahigh sensitivity with interpretable
+  linear models. PLOS ONE 21(3):e0343113. \doi{10.1371/journal.pone.0343113}
 
 \bibitem[{Chugh et~al.(2019)Chugh, Gulistan, Ghosh, and Rahman}]{chugh2019}
 Chugh S, Gulistan A, Ghosh S, et~al (2019) Machine learning approach for
@@ -16,6 +27,16 @@ Chugh S, Gulistan A, Ghosh S, et~al (2019) Machine learning approach for
 Ehyaee A, Rahmati A, Bosaghzadeh A, et~al (2024) Machine learning-enhanced
   surface plasmon resonance based photonic crystal fiber sensor. Optics Express
   32(8):13369--13383. \doi{10.1364/OE.521152}
+
+\bibitem[{Fasseaux et~al.(2024)Fasseaux, Loyez, and Caucheteur}]{fasseaux2024}
+Fasseaux H, Loyez M, Caucheteur C (2024) Machine learning unveils surface
+  refractive index dynamics in comb-like plasmonic optical fiber biosensors.
+  Communications Engineering 3(1):34. \doi{10.1038/s44172-024-00181-9}
+
+\bibitem[{Goswami et~al.(2023)Goswami, Khare, and Shakya}]{goswami2023}
+Goswami M, Khare P, Shakya S (2023) {AI} algorithm for mode classification of
+  {PCF-SPR} sensor design. Plasmonics 19(1):363--377.
+  \doi{10.1007/s11468-023-01997-5}
 
 \bibitem[{Gulrajani et~al.(2017)Gulrajani, Ahmed, Arjovsky, Dumoulin, and
   Courville}]{gulrajani2017}
@@ -32,10 +53,20 @@ Hammoud MK, Kalyoncu C, Yasli A (2026) High-efficiency confinement loss
 Johnson PB, Christy RW (1972) Optical constants of the noble metals. Physical
   Review B 6(12):4370--4379
 
+\bibitem[{Juwara et~al.(2024)Juwara, El-Hussuna, and El~Emam}]{juwara2024}
+Juwara L, El-Hussuna A, El~Emam K (2024) An evaluation of synthetic data
+  augmentation for mitigating covariate bias in health data. Patterns
+  5(4):100946. \doi{10.1016/j.patter.2024.100946}
+
 \bibitem[{Kaium and Mollah(2024)}]{kaium2024}
 Kaium SMA, Mollah MA (2024) Optical properties estimation of photonic crystal
   fiber using gaussian process regression. Optics Continuum 3(8):1369--1388.
   \doi{10.1364/OPTCON.527519}
+
+\bibitem[{Kaziz et~al.(2024)Kaziz, Echouchene, and Gazzah}]{kaziz2024}
+Kaziz S, Echouchene F, Gazzah MH (2024) Optimizing {PCF-SPR} sensor design
+  through {T}aguchi approach, machine learning, and genetic algorithms.
+  Scientific Reports 14(1):7837. \doi{10.1038/s41598-024-55817-9}
 
 \bibitem[{Khatun and Islam(2025)}]{khatun2025}
 Khatun MR, Islam MM (2025) Design optimization of high-sensitivity {PCF-SPR}
@@ -69,6 +100,18 @@ Rasmussen CE, Williams CKI (2006) Gaussian Processes for Machine Learning. MIT
 Rifat AA, Ahmed R, Yetisen AK, et~al (2017) Photonic crystal fiber based
   plasmonic sensors. Sensors and Actuators B: Chemical 243:311--325.
   \doi{10.1016/j.snb.2016.11.113}
+
+\bibitem[{Romeiro et~al.(2026)Romeiro, Silva, Costa, Giraldi, Guerreiro, and
+  Santos}]{romeiro2026}
+Romeiro AF, Silva AO, Costa JCWA, et~al (2026) Shaping photonic crystal fibers:
+  geometric optimization for {SPR} sensor performance. Optical and Quantum
+  Electronics 58(2):105. \doi{10.1007/s11082-025-08665-4}
+
+\bibitem[{Shumailov et~al.(2024)Shumailov, Shumaylov, Zhao, Papernot, Anderson,
+  and Gal}]{shumailov2024}
+Shumailov I, Shumaylov Z, Zhao Y, et~al (2024) {AI} models collapse when
+  trained on recursively generated data. Nature 631(8022):755--759.
+  \doi{10.1038/s41586-024-07566-y}
 
 \bibitem[{Smola and Sch{\"o}lkopf(2004)}]{smola2004}
 Smola AJ, Sch{\"o}lkopf B (2004) A tutorial on support vector regression.
