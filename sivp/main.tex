@@ -1,0 +1,797 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Signal, Image and Video Processing (Springer Nature)
+%% Manuscript: kernel surrogate modelling of PCF-SPR confinement loss
+%%
+%% Class options follow the SIVP submission guidelines: the journal asks for the
+%% Springer Nature template with the [iicol] two-column option.  SIVP uses the
+%% Springer Basic reference style with numbered citations, hence sn-basic +
+%% Numbered.  Build:  pdflatex -> bibtex -> pdflatex -> pdflatex
+%%
+%% Figure 1 is drawn inline with TikZ (Springer asks for a single .tex source
+%% and no \input).  Figures 2-4 are PDFs produced by the scripts in scripts/.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[iicol,pdflatex,sn-basic,Numbered]{sn-jnl}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{tikz}
+\usetikzlibrary{calc,arrows.meta,positioning}
+
+\definecolor{silica}{HTML}{E8E6F0}
+\definecolor{analyte}{HTML}{D6EAF6}
+\definecolor{goldlayer}{HTML}{EDA100}
+\definecolor{pml}{HTML}{EFEFEF}
+\definecolor{holeedge}{HTML}{4A3AA7}
+\definecolor{figink}{HTML}{1A1A1A}
+\definecolor{inkmuted}{HTML}{6B6B6B}
+
+\raggedbottom
+
+\begin{document}
+
+\title[Confinement-Loss Prediction in PCF-SPR Sensors]{Confinement-loss prediction
+in photonic crystal fiber SPR sensors: kernel surrogates versus generative data
+augmentation}
+
+\author*[1]{\fnm{Mohammad Khaleel} \sur{Hammoud}}\email{mhmdkhalil.h@gmail.com}
+
+\author[1]{\fnm{Cem} \sur{Kalyoncu}}\email{ckalyoncu@eul.edu.tr}
+
+\author[1]{\fnm{Ahmet} \sur{Yasli}}\email{ayasli@eul.edu.tr}
+
+\affil*[1]{\orgdiv{Department of Computer Engineering}, \orgname{European
+University of Lefke}, \orgaddress{\city{Lefke}, \country{Northern Cyprus, TR-10
+Mersin, Turkey}}}
+
+\abstract{Designing photonic crystal fiber (PCF) based surface plasmon resonance
+(SPR) sensors requires repeated full-vectorial finite element simulation, which
+makes iterative geometric optimisation prohibitively slow. Machine-learned
+surrogates are the standard remedy, and the prevailing strategy is to grow the
+scarce simulation set with a generative adversarial network before fitting a deep
+network. We show that this strategy is counterproductive for the kernel models
+that suit this data regime. On a 432-sample full-vectorial finite element
+dataset, a Bayesian-optimised support vector regressor reaches a mean squared
+error of 0.121 on the held-out geometry, against 0.314 for the published
+GAN-augmented deep network -- a 61\% reduction achieved without any synthetic
+data. Adding the same synthetic samples to the kernel models degrades them: the
+support vector regressor rises to 0.197 and Gaussian process regression collapses
+entirely. We trace the collapse to its cause, exhibiting generated sample pairs
+that sit 0.011 apart in scaled feature space yet differ by 0.168 in log-scaled
+loss, which drives the covariance matrix towards singularity. Shapley
+attribution identifies the outer cladding holes as the dominant control on
+confinement loss, and a Monte Carlo tolerance study identifies the lattice pitch
+as the dominant source of resonance instability under fabrication error. The
+resulting surrogate is interpretable, cheap to train, and needs 70\% less
+simulation data than comparable neural approaches.}
+
+\keywords{Photonic crystal fiber, Surface plasmon resonance, Support vector
+regression, Explainable artificial intelligence, Bayesian optimisation, Surrogate
+modelling}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}\label{sec:intro}
+
+Photonic crystal fibers coated with a thin plasmonic film form the basis of
+highly sensitive surface plasmon resonance sensors for chemical and biological
+detection. A guided core mode is deliberately allowed to leak towards a metal
+surface; where the mode index phase-matches the surface plasmon polariton, the
+confinement loss spectrum develops a sharp resonance whose wavelength tracks the
+refractive index of the surrounding analyte. Locating and shaping that resonance
+is a geometric design problem over the cladding lattice, the plasmonic film and
+the analyte channel.
+
+The established way to evaluate a candidate geometry is the full-vectorial finite
+element method (FV-FEM), which solves Maxwell's equations on the fiber cross
+section. FV-FEM is accurate but expensive, and a design study sweeping several
+geometric parameters across a wavelength grid quickly becomes a multi-day
+computation. This cost, rather than any modelling difficulty, is what limits
+practical PCF-SPR design.
+
+Machine-learned surrogates address the bottleneck by learning the map from
+geometry and wavelength to optical response, so that a trained model replaces the
+solver during the sweep. Chugh et al.~\cite{chugh2019} first applied artificial
+neural networks to PCF property computation. Deep surrogates, however, need far
+more training data than FV-FEM can cheaply supply, and the field's response has
+been to manufacture the missing data: Zelaci et al.~\cite{zelaci2021} trained a
+Wasserstein GAN with gradient penalty on their simulation set, used it to
+synthesise additional samples, and reported a mean squared error (MSE) of 0.314
+for the resulting augmented network.
+
+We argue that this sequence solves a problem that need not be created. The
+quantity being modelled is smooth in geometry apart from a sharp resonance peak,
+the sample count is small ($N < 500$), and the input space is six-dimensional.
+These are the conditions under which margin- and kernel-based regressors are
+expected to beat deep networks, and recent PCF studies bear this
+out~\cite{kaium2024,opoku2026}. If a kernel model is accurate enough on the
+original data, the augmentation step -- and the generative model behind it -- is
+unnecessary.
+
+This paper makes that case quantitatively, and then shows the augmentation step
+is not merely unnecessary but harmful. Our contributions are:
+
+\begin{enumerate}
+\item A Bayesian-optimised support vector regression (SVR) surrogate that attains
+an MSE of 0.121 on an unseen geometry using only the 432 original FV-FEM
+samples, a 61\% error reduction against the published GAN-augmented deep network
+and a 70\% reduction in data requirement against the closest
+neural alternative~\cite{ehyaee2024}.
+\item An \emph{augmentation paradox}: injecting GAN-generated samples into the
+same pipeline degrades SVR and destroys Gaussian process regression (GPR). We
+supply a mechanism rather than an observation, exhibiting generated sample pairs
+that are geometrically near-identical yet carry materially different targets,
+and showing how these drive the GPR covariance matrix towards singularity.
+\item A Shapley-value decomposition of the surrogate that attributes confinement
+loss primarily to the outer cladding hole diameters, connecting the regression to
+the physics of evanescent leakage rather than leaving it a black box.
+\item A Monte Carlo tolerance analysis that ranks the geometric parameters by
+their contribution to resonance instability under fabrication error, giving a
+fabrication priority that is absent from surrogate studies of this class.
+\end{enumerate}
+
+A preliminary version of this work appeared in the proceedings of the 34th IEEE
+Signal Processing and Communications Applications Conference~\cite{hammoud2026siu}.
+The present article extends it with a per-geometry cross-validation of every
+model, the mechanistic account and empirical evidence for the GPR collapse, the
+tolerance study of Sect.~\ref{sec:tolerance}, and an expanded treatment of the
+optimisation and evaluation protocol. All figures and tables have been produced
+anew for this article.
+
+Section~\ref{sec:related} surveys related surrogate work.
+Section~\ref{sec:model} describes the sensor and the FV-FEM model that generates
+the data. Section~\ref{sec:method} sets out the surrogate methodology.
+Section~\ref{sec:results} reports accuracy, the augmentation paradox, feature
+attribution, tolerance and spectral validation. Section~\ref{sec:discussion}
+discusses limitations, and Sect.~\ref{sec:conclusion} concludes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Related work}\label{sec:related}
+
+\paragraph{Neural surrogates for fiber optics.} Chugh et al.~\cite{chugh2019}
+established the template: sample the geometric design space with FV-FEM, fit a
+feed-forward network, and use it for fast sweeps. The approach is accurate where
+data is plentiful, and its weakness is precisely that requirement. Ehyaee et
+al.~\cite{ehyaee2024} pushed accuracy to an MSE of 0.084 on a PCF-SPR sensor, but
+needed 1,476 simulated samples to do it. The accuracy is real; the simulation
+budget is the cost.
+
+\paragraph{Generative augmentation.} Zelaci et al.~\cite{zelaci2021} attacked the
+data requirement directly, training a WGAN-GP~\cite{gulrajani2017} on their FV-FEM
+set and augmenting the training data with its output. Reported MSE improved from
+0.894 to 0.314. This is the baseline we contest: the improvement is measured
+against a deep network that was itself data-starved, and the comparison never
+asks whether a model suited to small data would have needed the synthetic samples
+at all.
+
+\paragraph{Kernel methods on small optical datasets.} Kizilkaya and
+Kalyoncu~\cite{kizilkaya2022} used $k$-nearest-neighbour regression for
+confinement loss in bent PCFs. Kaium and Mollah~\cite{kaium2024} applied GPR to
+PCF property estimation, and Opoku et al.~\cite{opoku2026} benchmarked ten
+regressors on a simulated PCF-SPR sensor, with kernel and ensemble methods
+leading. These results motivate our hypothesis but stop short of testing it
+against a generative-augmentation baseline on identical data, which is what we do
+here.
+
+\paragraph{Interpretability.} Khatun and Islam~\cite{khatun2025} applied Shapley
+additive explanations~\cite{lundberg2017} to a PCF-SPR design, isolating gold film
+thickness as a driver of sensitivity. We extend that style of analysis to a
+multi-family cladding lattice, where the question is not the thickness of one
+layer but which of several hole families controls leakage.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Sensor structure and numerical model}\label{sec:model}
+
+The dataset underlying this study was produced by FV-FEM analysis of the sensor
+cross section in Fig.~\ref{fig:cross_section}, computed in COMSOL Multiphysics
+with perfectly matched layers terminating the computational domain. The structure
+comprises a fused-silica host, a hexagonal cladding lattice of air holes, a
+plasmonic gold film, and an outer analyte channel that acts as the sensing
+medium.
+
+\begin{figure}[t]
+\centering
+\resizebox{\columnwidth}{!}{%
+\begin{tikzpicture}[
+    scale=0.80,
+    every node/.style={font=\scriptsize},
+    callout/.style={-{Latex[length=1.3mm]}, inkmuted, line width=0.3pt},
+  ]
+  \fill[pml, draw=inkmuted, line width=0.3pt] (0,0) circle (2.60);
+  \fill[analyte, draw=inkmuted, line width=0.3pt] (0,0) circle (2.14);
+  \fill[goldlayer] (0,0) circle (1.81);
+  \fill[silica, draw=inkmuted, line width=0.3pt] (0,0) circle (1.76);
+
+  \def\p{0.565}
+  \foreach \k in {0,...,5}{
+    \pgfmathsetmacro{\ang}{60*\k}
+    \fill[white, draw=holeedge, line width=0.6pt]
+      ({\p*cos(\ang)},{\p*sin(\ang)}) circle (0.177);
+  }
+  \foreach \k in {0,...,5}{
+    \pgfmathsetmacro{\ang}{60*\k}
+    \fill[white, draw=holeedge, line width=1.0pt]
+      ({2*\p*cos(\ang)},{2*\p*sin(\ang)}) circle (0.295);
+  }
+  \foreach \k in {0,...,5}{
+    \pgfmathsetmacro{\ang}{60*\k+30}
+    \fill[white, draw=holeedge, line width=0.6pt, densely dashed]
+      ({1.732*\p*cos(\ang)},{1.732*\p*sin(\ang)}) circle (0.138);
+  }
+  \fill[white, draw=holeedge, line width=0.45pt] (0,0) circle (0.059);
+
+  \draw[{Latex[length=1.1mm]}-{Latex[length=1.1mm]}, figink, line width=0.35pt]
+    ({\p*cos(180)},{\p*sin(180)}) -- ({\p*cos(240)},{\p*sin(240)});
+  \node[figink, anchor=north east, inner sep=0.5pt]
+    at ({0.5*\p*(cos(180)+cos(240))-0.10},{0.5*\p*(sin(180)+sin(240))-0.04}) {$\Lambda$};
+
+  \draw[callout] (3.05,2.02) -- (1.80,1.22);
+  \node[inkmuted, anchor=west] at (3.05,2.02) {absorbing boundary};
+  \draw[callout] (3.05,1.32) -- (1.50,1.01);
+  \node[inkmuted, anchor=west] at (3.05,1.32) {analyte channel, $n_a$};
+  \draw[callout] (3.05,0.62) -- (1.28,1.28);
+  \node[inkmuted, anchor=west] at (3.05,0.62) {Au film, $t = 40$\,nm};
+  \draw[callout] (3.05,-0.08) -- (1.55,-0.45);
+  \node[inkmuted, anchor=west] at (3.05,-0.08) {fused-silica host};
+
+  \begin{scope}[shift={(3.05,-1.62)}]
+    \node[figink, anchor=west] at (0,0.50) {cladding hole families};
+    \fill[white, draw=holeedge, line width=1.0pt] (0.13,0.17) circle (0.13);
+    \node[inkmuted, anchor=west] at (0.34,0.17) {$d_2 = 0.75$};
+    \fill[white, draw=holeedge, line width=0.6pt] (0.13,-0.19) circle (0.10);
+    \node[inkmuted, anchor=west] at (0.34,-0.19) {$d_1 = 0.45$};
+    \fill[white, draw=holeedge, line width=0.6pt, densely dashed]
+      (0.13,-0.55) circle (0.08);
+    \node[inkmuted, anchor=west] at (0.34,-0.55) {$d_3 = 0.35$};
+    \fill[white, draw=holeedge, line width=0.45pt] (0.13,-0.91) circle (0.045);
+    \node[inkmuted, anchor=west] at (0.34,-0.91) {$d_c = 0.15$};
+  \end{scope}
+\end{tikzpicture}}
+\caption{Cross section of the modelled PCF-SPR sensor. Three families of air
+holes are arranged on a hexagonal lattice of pitch $\Lambda$ in a fused-silica
+host, with a central defect hole of diameter $d_c$. Light leaking from the core
+couples to the surface plasmon supported by the gold film, which separates the
+lattice from the analyte channel. Legend diameters are in \textmu m and give the
+nominal design; the dataset sweeps them over the ranges in
+Table~\ref{tab:design}.}\label{fig:cross_section}
+\end{figure}
+
+Nineteen air holes in three diameter families form the cladding, together with a
+small central defect hole. The gold film is 40\,nm thick, with permittivity taken
+from the Johnson and Christy measurements~\cite{johnson1972}. The refractive index
+of the silica host follows the Sellmeier relation~\cite{rifat2017}
+
+\begin{equation}
+n^2(\lambda) = 1 + \sum_{i=1}^{3} \frac{B_i\lambda^2}{\lambda^2 - C_i},
+\label{eq:sellmeier}
+\end{equation}
+
+with $\lambda$ the operating wavelength and $B_i$, $C_i$ the standard Sellmeier
+coefficients for fused silica. The quantity to be predicted is the confinement
+loss, obtained from the imaginary part of the effective index
+as~\cite{zelaci2021}
+
+\begin{equation}
+L_c = \frac{40\pi}{\ln(10)\,\lambda}\,\mathrm{Im}(n_\mathrm{eff})\times 10^{4}
+\quad [\mathrm{dB/cm}].
+\label{eq:confinement_loss}
+\end{equation}
+
+$L_c$ peaks at the phase-matching condition, so it is the resonance region --
+where the function is least smooth -- that a surrogate must reproduce.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Surrogate modelling methodology}\label{sec:method}
+
+\subsection{Dataset and preprocessing}\label{sec:dataset}
+
+We use the FV-FEM dataset of Zelaci et al.~\cite{zelaci2021}, so that the
+comparison against their GAN-augmented network is made on identical data. It
+contains 432 labelled samples over six input variables: analyte refractive index
+$n_a$, wavelength $\lambda$, lattice pitch $\Lambda$, and the three cladding hole
+diameters $d_1$, $d_2$, $d_3$. Table~\ref{tab:design} summarises the sampled
+design space.
+
+\begin{table}[t]
+\caption{Sampled design space. Nine geometric configurations, each evaluated for
+three analytes over a 16-point wavelength grid, give $9 \times 3 \times 16 = 432$
+FV-FEM samples.}\label{tab:design}
+\begin{tabular*}{\columnwidth}{@{\extracolsep\fill}lll}
+\toprule
+Variable & Role & Sampled values \\
+\midrule
+$n_a$      & analyte index   & 1.33, 1.34, 1.35 \\
+$\lambda$  & wavelength      & 16-point grid \\
+$\Lambda$  & lattice pitch   & 0.15, 0.20, 0.24 \\
+$d_1$      & inner holes     & 0.25, 0.45 \\
+$d_2$      & outer holes     & 0.55, 0.75 \\
+$d_3$      & interstitial holes & 0.15, 0.35 \\
+$d_c$      & central defect  & 0.15 (fixed) \\
+\midrule
+$L_c$      & target          & $10^{-3}$--$59.1$\,dB/cm \\
+\botrule
+\end{tabular*}
+\footnotetext{Geometric values in \textmu m; $\lambda$ is retained in the native
+units of the source dataset.}
+\end{table}
+
+The target spans nearly five orders of magnitude and is dominated by the
+resonance peak, so we regress the log-scaled response
+$y = \log_{10}(L_c \times 10^{8})$. This both compresses the dynamic range and
+makes squared error a sensible loss across the whole spectrum rather than one
+concentrated at the peak. Inputs are min-max scaled to $[0,1]$, which matters for
+the radial basis function (RBF) kernel because an unscaled wavelength axis would
+otherwise dominate the distance metric.
+
+\subsection{Evaluation protocol}\label{sec:protocol}
+
+Random train-test splitting would be misleading here. The 432 samples are not
+independent: they come from nine geometric configurations, each contributing a
+full wavelength sweep. A random split leaves samples from the same geometry on
+both sides, so the model is asked to interpolate within a spectrum it has
+already seen, and the reported error understates what matters -- generalisation
+to a geometry that has not been simulated.
+
+We therefore evaluate at the level of geometries, under two protocols:
+
+\begin{itemize}
+\item \textbf{Fixed partition.} The 7--1--1 split of~\cite{zelaci2021}:
+configurations 1--7 for training, 8 for validation, 9 held out for test. This
+reproduces the published protocol exactly and is the basis for the headline
+comparison.
+\item \textbf{Leave-one-geometry-out (LOGO).} Each of the nine configurations
+serves in turn as the test set, the other eight as training data. This gives
+nine independent estimates and, unlike the fixed partition, reports the variance
+across geometries as well as the mean.
+\end{itemize}
+
+The fixed partition alone is a single draw and can flatter a model that happens
+to suit configuration 9. LOGO is the more informative of the two, and we report
+both.
+
+\subsection{Support vector regression}\label{sec:svr}
+
+SVR fits a function that deviates from the observed targets by at most $\epsilon$
+while remaining as flat as possible, penalising only the samples that fall
+outside that tube~\cite{smola2004}:
+
+\begin{equation}
+\min_{w,b,\xi,\xi^{*}} \; \frac{1}{2}\|w\|^{2}
++ C\sum_{i=1}^{n}\left(\xi_i + \xi_i^{*}\right),
+\label{eq:svr_primal}
+\end{equation}
+
+subject to
+\begin{equation}
+\left\{
+\begin{array}{l}
+y_i - \langle w, x_i\rangle - b \le \epsilon + \xi_i,\\[2pt]
+\langle w, x_i\rangle + b - y_i \le \epsilon + \xi_i^{*},\\[2pt]
+\xi_i, \xi_i^{*} \ge 0,
+\end{array}
+\right.
+\label{eq:svr_constraints}
+\end{equation}
+
+where $C$ is the box constraint and $\xi_i$, $\xi_i^{*}$ are slack variables. We
+use the RBF kernel
+$K(x_i,x_j) = \exp(-\gamma\|x_i - x_j\|^{2})$.
+
+The relevant property for this problem is that the fit is determined by the
+support vectors -- the samples on or outside the tube boundary -- rather than by
+all 432 points equally. Near the resonance, where the response turns sharply,
+that concentrates model capacity exactly where the function is hardest, and it is
+why the method tolerates a small sample count. The dual formulation and the
+Karush-Kuhn-Tucker conditions are given in the Online Supplement, Sect.~S1.
+
+\subsection{Gaussian process regression}\label{sec:gpr}
+
+GPR places a Gaussian process prior $f(x)\sim\mathcal{GP}(m(x),k(x,x'))$ over
+functions, so that the posterior mean and covariance at a test input $x_*$
+are~\cite{rasmussen2006}
+
+\begin{align}
+\bar{f}_* &= K_*^{\top}\left[K + \sigma_n^{2}I\right]^{-1}y,
+\label{eq:gpr_mean}\\
+\mathrm{cov}(f_*) &= K_{**} - K_*^{\top}\left[K + \sigma_n^{2}I\right]^{-1}K_*,
+\label{eq:gpr_cov}
+\end{align}
+
+with $K$ the training covariance, $K_*$ the train-test covariance and
+$\sigma_n^{2}$ the noise variance. We use an RBF kernel with an additive white
+noise term, which regularises the inversion in \eqref{eq:gpr_mean} and
+\eqref{eq:gpr_cov}. GPR offers calibrated uncertainty, which SVR does not, and
+that makes its behaviour under augmentation in Sect.~\ref{sec:paradox}
+diagnostic: the same smoothness assumption that yields the uncertainty estimate
+is what the synthetic data violates.
+
+\subsection{Hyperparameter optimisation}\label{sec:bayesopt}
+
+$C$, $\gamma$ and $\epsilon$ interact, and grid search over three coupled
+continuous parameters wastes most of its budget in uninformative regions. We
+instead use Gaussian-process Bayesian optimisation~\cite{snoek2012} with expected
+improvement, 32 evaluations, and log-uniform priors over
+$C\in[1,2000]$, $\gamma\in[10^{-4},1]$ and $\epsilon\in[10^{-4},10^{-1}]$,
+scoring each candidate by three-fold cross-validated MSE on the training
+partition only. The selected configuration and the full search space are
+tabulated in the Online Supplement, Sect.~S2.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Results}\label{sec:results}
+
+\subsection{Predictive accuracy}\label{sec:accuracy}
+
+Table~\ref{tab:benchmark} reports every model under both protocols. On the fixed
+partition the optimised SVR reaches an MSE of 0.121, against 0.314 for the
+GAN-augmented deep network of~\cite{zelaci2021} and 0.894 for the unaugmented
+network -- a 61\% error reduction relative to the augmented baseline, obtained
+without generating a single synthetic sample. GPR reaches 0.185, also well ahead
+of both neural baselines.
+
+\begin{table*}[t]
+\caption{Accuracy of each surrogate under both evaluation protocols. Rows are
+metrics and columns are models, so that the fixed-partition result and the
+distribution over the nine leave-one-geometry-out folds can be read against each
+other for a given model. Lower is better throughout; dashes mark figures not
+reported in the source work.}\label{tab:benchmark}
+\small
+\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lccccc}
+\toprule
+& \multicolumn{2}{c}{Published neural baselines} & \multicolumn{2}{c}{This work} & \\
+\cmidrule{2-3}\cmidrule{4-5}
+Metric & Deep net~\cite{zelaci2021} & GAN-augmented~\cite{zelaci2021}
+& \textbf{SVR} & GPR & ML-enhanced ANN~\cite{ehyaee2024} \\
+\midrule
+Fixed-partition MSE       & 0.894 & 0.314 & \textbf{0.121} & 0.185 & 0.084 \\
+LOGO mean MSE             & ---   & 0.825 & \textbf{0.246} & ---   & ---   \\
+LOGO standard deviation   & ---   & 0.609 & \textbf{0.226} & ---   & ---   \\
+Training samples          & 432   & 432 + synth. & \textbf{432} & 432 & 1{,}476 \\
+Synthetic data            & no    & yes   & \textbf{no}    & no    & no    \\
+\botrule
+\end{tabular*}
+\footnotetext{MSE is computed on the $\log_{10}$-scaled confinement loss defined
+in Sect.~\ref{sec:dataset}.}
+\end{table*}
+
+The LOGO protocol matters more, and it separates the models further. Averaged
+over the nine held-out geometries the SVR attains an MSE of 0.246 with a standard
+deviation of 0.226, against 0.825 $\pm$ 0.609 for the augmented benchmark. The
+gap in the standard deviation is the more useful number for a design tool: a
+surrogate that is accurate on average but occasionally wrong by a wide margin on
+an unfamiliar geometry cannot be trusted to drive an optimisation loop. Per-fold
+results are given in the Online Supplement, Sect.~S3.
+
+The comparison with Ehyaee et al.~\cite{ehyaee2024} is worth stating carefully.
+Their ML-enhanced ANN reaches an MSE of 0.084, better than our 0.121. It does so
+with 1,476 training samples against our 432. Since the training samples are FV-FEM
+solutions, that difference is the dominant cost in the entire pipeline, and a
+70\% reduction in it for a 0.037 increase in MSE is the trade a design study
+would take.
+
+The mechanism behind the SVR result is the one anticipated in
+Sect.~\ref{sec:svr}. A deep network fits a global function and needs enough
+samples to constrain it everywhere; with nine geometries that constraint is weak.
+SVR instead concentrates on the support vectors that bound the transition between
+the high- and low-loss regions, which is where the response actually carries
+information, and extrapolates to an unseen geometry from that boundary rather
+than from a globally interpolated surface.
+
+\subsection{The augmentation paradox}\label{sec:paradox}
+
+We next applied the augmentation strategy of~\cite{zelaci2021} to our own models,
+generating synthetic samples with the same WGAN-GP configuration and adding them
+to the training partition. If synthetic data helps data-hungry models, the
+question is whether it helps models that were not starved to begin with.
+
+It does not. Table~\ref{tab:augmentation} shows SVR degrading from 0.121 to
+0.197 and GPR failing outright. The direction is consistent across the LOGO folds
+(Online Supplement, Sect.~S3): augmentation is not adding noise that averages
+out, it is displacing the fit.
+
+\begin{table}[t]
+\caption{Effect of adding GAN-generated samples to the training partition, split
+out here from the accuracy comparison because it measures a different thing:
+not which model is best, but what augmentation does to a model that did not need
+it.}\label{tab:augmentation}
+\begin{tabular*}{\columnwidth}{@{\extracolsep\fill}lccc}
+\toprule
+Model & Real only & Augmented & Change \\
+\midrule
+SVR & 0.121 & 0.197 & $+63\%$ \\
+GPR & 0.185 & 23.844 & collapse \\
+\midrule
+Deep network~\cite{zelaci2021} & 0.894 & 0.314 & $-65\%$ \\
+\botrule
+\end{tabular*}
+\footnotetext{Fixed-partition MSE. The neural row is reproduced
+from~\cite{zelaci2021} for contrast: the same synthetic samples that help a
+data-starved network harm both kernel models.}
+\end{table}
+
+The GPR failure is the informative case, because it is not a gradual degradation
+but a numerical breakdown, and its cause is identifiable. A GAN is a
+probabilistic sampler with no constraint tying it to Maxwell's equations, so
+nothing prevents it from emitting two samples that are geometrically almost
+identical while carrying materially different losses. Such a pair is physically
+impossible -- the same geometry at the same wavelength has one confinement loss --
+but it is entirely consistent with a generator that has learned the marginal
+distributions without the physics.
+
+To confirm this we generated 50,000 samples, found each one's nearest neighbour
+in the scaled feature space, and ranked the resulting pairs by the ratio of
+target discrepancy to feature distance. Table~\ref{tab:gan_fail} lists the three
+worst. The leading pair sits 0.011 apart in a space scaled to the unit cube, yet
+its targets differ by 0.168 in log-scaled loss, a 45\% discrepancy in physical
+units. The search protocol is detailed in the Online Supplement, Sect.~S4.
+
+\begin{table}[t]
+\caption{The three most contradictory nearest-neighbour pairs among 50,000
+GAN-generated samples, ranked by target discrepancy per unit of feature
+distance. Quantities run down the rows and pairs across the columns; each column
+is one pair of generated samples that are near-identical in the input space but
+carry incompatible targets.}\label{tab:gan_fail}
+\small
+\begin{tabular*}{\columnwidth}{@{\extracolsep\fill}lccc}
+\toprule
+Quantity & Pair A & Pair B & Pair C \\
+\midrule
+Feature distance         & 0.0111 & 0.0089 & 0.0088 \\
+Target 1 ($\log_{10}$)   & 4.4466 & 4.3722 & 4.3280 \\
+Target 2 ($\log_{10}$)   & 4.6144 & 4.4958 & 4.4347 \\
+Target discrepancy       & 0.1678 & 0.1236 & 0.1067 \\
+Discrepancy/distance     & 15.09  & 13.81  & 12.06 \\
+\botrule
+\end{tabular*}
+\footnotetext{Feature distance is Euclidean in the min-max scaled
+seven-dimensional space the generator was trained on; targets are the
+$\log_{10}$-scaled confinement loss.}
+\end{table}
+
+For GPR this is fatal rather than merely unhelpful. The posterior in
+\eqref{eq:gpr_mean} requires inverting $[K + \sigma_n^{2}I]$. Two inputs at
+distance 0.011 produce near-identical rows in $K$, so the matrix approaches
+singularity; the white-noise term $\sigma_n^{2}$ is what normally absorbs this,
+but it is calibrated to the noise level of the real data and is far too small to
+absorb a 0.168 jump. The inverse is then dominated by the ill-conditioned
+directions and the predictive variance explodes. SVR survives because its
+$\epsilon$-insensitive loss simply admits both contradictory points as bounded
+support vectors -- it fits a worse function, but it does not break.
+
+The general lesson is that generative augmentation trades a data-quantity problem
+for a data-consistency one. A model that needs the quantity may accept the trade.
+A model that does not is strictly worse off.
+
+\subsection{What the surrogate learned}\label{sec:xai}
+
+A surrogate that is accurate but opaque is of limited use in design, where the
+question is not only what the loss will be but which parameter to change. We
+applied Shapley additive explanations~\cite{lundberg2017} to the trained SVR,
+which decomposes each prediction into additive per-feature contributions.
+
+Figure~\ref{fig:shap} gives the resulting global ranking. The outer cladding
+diameters $d_2$ and $d_3$ dominate, together accounting for 63\% of total
+attribution, followed by the lattice pitch $\Lambda$ at 23\%. Wavelength
+contributes 9\%, and the innermost holes $d_1$ barely register at 2\%.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig2_shap_importance.pdf}
+\caption{Global Shapley attribution for the trained SVR, expressed as each
+variable's share of total attributed magnitude. The outer cladding families
+$d_2$ and $d_3$ jointly account for 63\% of the attribution; the innermost holes
+$d_1$ are nearly inert.}\label{fig:shap}
+\end{figure}
+
+This ordering is physically consistent, and reading it against the geometry of
+Fig.~\ref{fig:cross_section} explains why. Confinement loss is set by how much of
+the core field reaches the gold surface, and the outer hole families are what
+that field must traverse to get there. Enlarging $d_2$ or $d_3$ raises the index
+contrast of the outer cladding, tightening confinement and suppressing leakage.
+The innermost holes sit inside the field maximum, where they shape the mode
+profile but do very little to gate its escape -- hence their negligible
+attribution. That the model recovers this ordering from data alone, without being
+told the physics, is evidence it has learned the leakage mechanism rather than a
+correlation.
+
+\subsection{Manufacturing tolerance}\label{sec:tolerance}
+
+Fiber drawing does not reproduce a design exactly, so a surrogate is only useful
+for design if it can also say which deviations matter. We perturbed the geometric
+inputs with Gaussian noise at 1\%, 3\% and 5\% relative standard deviation, ran
+100 Monte Carlo trials at each level, and recorded the induced scatter in the
+predicted resonance wavelength (Table~\ref{tab:tolerance}). We then repeated the
+experiment perturbing one variable at a time to attribute the scatter
+(Fig.~\ref{fig:robustness}).
+
+\begin{table}[t]
+\caption{Monte Carlo scatter of the predicted resonance wavelength under
+geometric perturbation. Tolerance levels run across the columns, so the growth of
+each statistic with fabrication error can be read along a row.}\label{tab:tolerance}
+\begin{tabular*}{\columnwidth}{@{\extracolsep\fill}lccc}
+\toprule
+Statistic & 1\% & 3\% & 5\% \\
+\midrule
+Peak jitter (std)  & 1.03 & 1.27 & 1.34 \\
+Peak spread (range) & 2.96 & 3.00 & 3.00 \\
+\botrule
+\end{tabular*}
+\footnotetext{100 trials per level, all four geometric variables perturbed
+simultaneously. Values are in the native wavelength units of the source dataset.}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig4_robustness.pdf}
+\caption{Resonance jitter attributable to each geometric variable at 3\%
+tolerance, on a logarithmic scale. The lattice pitch (highlighted) dominates by
+more than a factor of five over the next variable and by two orders of magnitude
+over the innermost holes.}\label{fig:robustness}
+\end{figure}
+
+The pitch $\Lambda$ dominates, contributing over 90\% of the observed jitter,
+while $d_1$ contributes almost none. The practical reading is a fabrication
+priority: pitch uniformity along the drawn fiber governs whether a device matches
+its calibration, whereas tolerance on the smallest cladding holes can be relaxed
+without meaningful spectral cost.
+
+Two caveats attach to these numbers. First, the peak spread in
+Table~\ref{tab:tolerance} nearly equals the width of the wavelength grid itself,
+which indicates the peak-detection step is reaching the grid boundary in a
+substantial fraction of trials; the jitter figures should therefore be read as an
+upper bound and as a ranking rather than as calibrated magnitudes. Second, the
+analysis perturbs the surrogate's inputs, so it propagates geometric tolerance
+but not the surrogate's own predictive error.
+
+% ---------------------------------------------------------------------------
+% FLAGGED FOR THE AUTHORS -- units, carried over unchanged from the SIU paper.
+%
+% The `lambda' column of data.xlsx runs 5.0-8.0.  Silica/gold SPR physics puts
+% this resonance at 500-800 nm, i.e. the column is in units of 100 nm.  If so,
+% the 0.2763 peak shift per 0.01 RIU step is 27.63 nm per 0.01 RIU, and the
+% sensitivity is ~2763 nm/RIU -- not the 27.63 nm/RIU printed in the SIU paper,
+% which is off by 100x.  27.63 nm/RIU would also be implausibly low for a
+% PCF-SPR sensor.  The same factor applies to the Table 5 jitter figures
+% (1.27 -> 127 nm).
+%
+% Per author instruction the conference values are reproduced here unchanged and
+% wavelength-derived quantities are stated in dataset units.  Resolve before
+% submission: either confirm the unit convention and rescale, or state the
+% convention explicitly in Sect. 4.1.
+% ---------------------------------------------------------------------------
+
+\subsection{Spectral validation}\label{sec:spectral}
+
+Aggregate error statistics can hide a surrogate that is right on average and
+wrong in shape. As a physical check we swept the trained SVR across the full
+wavelength range at fixed geometry for each analyte and examined the predicted
+spectra directly (Fig.~\ref{fig:spectral}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig3_spectral_response.pdf}
+\caption{Predicted confinement-loss spectra at fixed geometry for the three
+analyte indices. Rings mark the predicted resonance. The peak moves
+monotonically to longer wavelengths as $n_a$ increases, in uniform steps of
+0.276 dataset units per 0.01 refractive index unit.}\label{fig:spectral}
+\end{figure}
+
+The surrogate reproduces the expected behaviour: a single well-formed resonance
+that shifts monotonically to longer wavelengths as the analyte index rises from
+1.33 to 1.35, in near-uniform steps of 0.279 and 0.273 dataset units. Since the
+model was never given the phase-matching condition, recovering both the direction
+and the regularity of the shift indicates it has captured the underlying
+coupling rather than memorising the training spectra. The corresponding
+sensitivity is 27.63 per refractive index unit in the units of the source
+dataset.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion and limitations}\label{sec:discussion}
+
+The results support a narrower claim than "kernels beat deep learning". Deep
+surrogates are not weak here because they are deep; they are weak because nine
+geometries do not constrain a global function approximator, and the field's
+response -- synthesising more data -- addresses the symptom. Where enough real
+simulation data exists, the neural result of~\cite{ehyaee2024} is the better
+model. The regime we address is the common one where it does not.
+
+Three limitations bound the work. First, everything rests on FV-FEM output; the
+surrogate inherits whatever the numerical model gets wrong, and experimental
+validation on a drawn fiber remains necessary. Fabrication effects outside the
+model -- gold surface roughness, material impurity, ellipticity of the drawn
+holes -- will affect sensitivity and signal-to-noise in ways no amount of
+surrogate accuracy can anticipate.
+
+Second, the surrogate is interpolative within the sampled design space of
+Table~\ref{tab:design}. It is not a substitute for FV-FEM outside those ranges,
+and the LOGO protocol measures generalisation to an unseen geometry within the
+sampled envelope, not beyond it.
+
+Third, the augmentation paradox is demonstrated for one generator architecture on
+one dataset. The mechanism we identify -- a generator with no physical constraint
+emitting inconsistent near-duplicate pairs -- is not specific to WGAN-GP, and we
+expect it to affect any unconstrained generative augmentation feeding a kernel
+model. Establishing that requires testing physics-informed generators, which
+would be the natural way to obtain the data volume without the inconsistency.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion}\label{sec:conclusion}
+
+We have shown that a Bayesian-optimised support vector regressor predicts PCF-SPR
+confinement loss more accurately than a GAN-augmented deep network on identical
+data -- an MSE of 0.121 against 0.314, a 61\% reduction -- while using only the
+432 original FV-FEM samples and no synthetic data at all. Under
+leave-one-geometry-out validation the advantage holds in both mean and variance,
+0.246 $\pm$ 0.226 against 0.825 $\pm$ 0.609.
+
+The augmentation step that the surrogate literature has converged on is, for this
+class of model, actively harmful. Adding GAN-generated samples raises SVR error by
+63\% and collapses GPR entirely, and we have traced the collapse to generated
+sample pairs that are geometrically near-identical yet carry incompatible
+targets, driving the covariance matrix towards singularity. Generative
+augmentation exchanges a shortage of data for an inconsistency in it; that
+exchange is only worth making for a model that cannot function without the
+volume.
+
+Beyond accuracy, the surrogate yields design guidance. Shapley attribution
+identifies the outer cladding diameters as the dominant control on confinement
+loss, consistent with their role in gating evanescent leakage, and Monte Carlo
+tolerance analysis identifies the lattice pitch as the dominant source of
+resonance instability under fabrication error. Together these give a designer
+both the parameter to tune and the parameter to hold, at a computational cost of
+seconds per evaluation rather than hours.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\backmatter
+
+\bmhead{Supplementary information}
+
+The Online Supplement contains the SVR dual formulation and KKT conditions
+(Sect.~S1), the Bayesian optimisation search space and selected hyperparameters
+(Sect.~S2), per-fold leave-one-geometry-out results (Sect.~S3), the WGAN-GP
+configuration and contradiction-search protocol (Sect.~S4), a GPR kernel and
+regulariser ablation (Sect.~S5), and the full Monte Carlo tolerance tables
+(Sect.~S6).
+
+\bmhead{Acknowledgements}
+
+The authors thank the Department of Computer Engineering, European University of
+Lefke, for computational support.
+
+\section*{Declarations}
+
+\textbf{Funding.} No funding was received for conducting this study.
+
+\textbf{Conflict of interest.} The authors declare no competing interests.
+
+\textbf{Ethics approval and consent to participate.} Not applicable.
+
+\textbf{Consent for publication.} Not applicable.
+
+\textbf{Data availability.} The FV-FEM dataset analysed in this study was
+generated in the course of~\cite{zelaci2021} and is available from the authors on
+reasonable request.
+
+\textbf{Materials availability.} Not applicable.
+
+\textbf{Code availability.} The model, evaluation and figure-generation code is
+available from the corresponding author on reasonable request.
+
+\textbf{Author contribution.} M.K.H. designed and implemented the surrogate
+models, the augmentation experiments and the analyses, and drafted the
+manuscript. C.K. supervised the machine-learning methodology and revised the
+manuscript. A.Y. provided the photonic modelling and FV-FEM dataset and revised
+the manuscript. All authors read and approved the final manuscript.
+
+\textbf{Prior publication.} A preliminary version of this work was presented at
+the 34th IEEE Signal Processing and Communications Applications Conference
+(SIU~2026)~\cite{hammoud2026siu}. The present article substantially extends that
+paper as described in Sect.~\ref{sec:intro}; all figures and tables have been
+newly prepared for this submission.
+
+\bibliography{refs}
+
+\end{document}
