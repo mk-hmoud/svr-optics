@@ -361,16 +361,19 @@ Peak spread (range)  & 2.964 & 3.000 & 3.000 \\
 \midrule
 \multicolumn{4}{l}{\emph{One variable at a time, 3\% tolerance}} \\
 \midrule
-Variable    & Jitter (std) & Share of total & Rank \\
-$\Lambda$   & 1.231 & 76\% & 1 \\
-$d_2$       & 0.244 & 15\% & 2 \\
-$d_3$       & 0.139 &  9\% & 3 \\
-$d_1$       & 0.008 & $<1\%$ & 4 \\
+Variable    & Jitter (std) & Share of variance & Rank \\
+$\Lambda$   & 1.231 & 95.1\% & 1 \\
+$d_2$       & 0.244 &  3.7\% & 2 \\
+$d_3$       & 0.139 &  1.2\% & 3 \\
+$d_1$       & 0.008 & $<0.1\%$ & 4 \\
 \botrule
 \end{tabular*}
-\footnotetext{Shares are of the summed per-variable volatilities and do not
-account for interaction between variables, which is why they need not reproduce
-the simultaneous-perturbation jitter in the upper panel.}
+\footnotetext{Shares are of total variance, $\sigma_i^2/\sum_j\sigma_j^2$, since
+variances rather than standard deviations are additive; this is the basis on
+which the pitch is said to account for over 90\% of the jitter in Sect.~5.4 of
+the main article. The decomposition ignores interaction between variables, which
+is why it need not reproduce the simultaneous-perturbation jitter of the upper
+panel.}
 \end{table}
 
 \subsection{Limitation of the peak-detection step}
