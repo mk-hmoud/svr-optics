@@ -41,8 +41,8 @@ Goswami M, Khare P, Shakya S (2023) {AI} algorithm for mode classification of
 \bibitem[{Gulrajani et~al.(2017)Gulrajani, Ahmed, Arjovsky, Dumoulin, and
   Courville}]{gulrajani2017}
 Gulrajani I, Ahmed F, Arjovsky M, et~al (2017) Improved training of
-  {W}asserstein {GAN}s. In: Advances in Neural Information Processing Systems,
-  pp 5767--5777
+  {W}asserstein {GAN}s. In: Advances in Neural Information Processing Systems
+  30
 
 \bibitem[{Hammoud et~al.(2026)Hammoud, Kalyoncu, and Yasli}]{hammoud2026siu}
 Hammoud MK, Kalyoncu C, Yasli A (2026) High-efficiency confinement loss
@@ -80,8 +80,7 @@ Kizilkaya Y, Kalyoncu C (2022) Determination of confinement loss
 
 \bibitem[{Lundberg and Lee(2017)}]{lundberg2017}
 Lundberg SM, Lee SI (2017) A unified approach to interpreting model
-  predictions. In: Advances in Neural Information Processing Systems, pp
-  4765--4774
+  predictions. In: Advances in Neural Information Processing Systems 30
 
 \bibitem[{Opoku et~al.(2026)Opoku, Opoku-Ware, Danlard, Akowuah, N-Yorbe,
   Quarcoo, Sabbi, and Haxha}]{opoku2026}
@@ -115,12 +114,13 @@ Shumailov I, Shumaylov Z, Zhao Y, et~al (2024) {AI} models collapse when
 
 \bibitem[{Smola and Sch{\"o}lkopf(2004)}]{smola2004}
 Smola AJ, Sch{\"o}lkopf B (2004) A tutorial on support vector regression.
-  Statistics and Computing 14(3):199--222
+  Statistics and Computing 14(3):199--222.
+  \doi{10.1023/B:STCO.0000035301.49549.88}
 
 \bibitem[{Snoek et~al.(2012)Snoek, Larochelle, and Adams}]{snoek2012}
 Snoek J, Larochelle H, Adams RP (2012) Practical {B}ayesian optimization of
-  machine learning algorithms. Advances in Neural Information Processing
-  Systems 25:2951--2959
+  machine learning algorithms. In: Advances in Neural Information Processing
+  Systems 25
 
 \bibitem[{Zelaci et~al.(2021)Zelaci, Yasli, Kalyoncu, and Ademgil}]{zelaci2021}
 Zelaci A, Yasli A, Kalyoncu C, et~al (2021) Generative adversarial neural
