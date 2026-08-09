@@ -54,10 +54,12 @@ reference list of the main article, reproduced here for convenience.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Support vector regression: dual formulation}\label{sup:svr}
 
-The main article states the primal problem, Eqs.~(3)--(4). Introducing Lagrange
-multipliers $\alpha_i, \alpha_i^{*} \ge 0$ for the two $\epsilon$-tube
-constraints and $\eta_i, \eta_i^{*} \ge 0$ for the non-negativity of the slacks
-gives the Lagrangian
+The main article states the primal problem, Eqs.~(3)--(4). The derivation below
+is the standard one~\cite{smola2004}, reproduced here so that the argument of
+Sect.~5.2 of the main article can be followed without a second source.
+Introducing Lagrange multipliers $\alpha_i, \alpha_i^{*} \ge 0$ for the two
+$\epsilon$-tube constraints and $\eta_i, \eta_i^{*} \ge 0$ for the
+non-negativity of the slacks gives the Lagrangian
 
 \begin{align}
 L = {}& \frac{1}{2}\|w\|^{2} + C\sum_{i=1}^{n}(\xi_i + \xi_i^{*})
@@ -117,7 +119,7 @@ concentrates the fit near the resonance transition, where the response is
 steepest, and it is why the model tolerates a training set of 432 samples.
 
 Condition \eqref{eq:kkt} also explains the contrast with Gaussian process
-regression in Sect.~5.2 of the main article. A pair of near-duplicate inputs
+regression~\cite{rasmussen2006} in Sect.~5.2 of the main article. A pair of near-duplicate inputs
 carrying contradictory targets simply saturates at $\alpha_i = C$: both points
 become bounded support vectors, the fitted function is worse, but nothing in
 \eqref{eq:dual} becomes ill-posed. There is no matrix to invert.
@@ -127,7 +129,8 @@ become bounded support vectors, the fitted function is worse, but nothing in
 
 Table~\ref{tab:searchspace} gives the search space and the selected
 configuration. The acquisition function is expected improvement over a Gaussian
-process surrogate on the hyperparameter space, with 32 evaluations. Each
+process surrogate on the hyperparameter space~\cite{snoek2012}, with 32
+evaluations. Each
 candidate is scored by three-fold cross-validated mean squared error computed on
 the training partition only, so no information from the held-out geometry enters
 the selection.
@@ -219,9 +222,10 @@ genuinely thin.
 
 \subsection{WGAN-GP configuration}
 
-The generative model reimplements the architecture reported by Zelaci et
-al.~\cite{zelaci2021}, so that the augmentation experiment tests their procedure
-and not a variant of it. Table~\ref{tab:wgan} gives the configuration.
+The generative model is a Wasserstein GAN with gradient
+penalty~\cite{gulrajani2017}, reimplementing the architecture reported by Zelaci
+et al.~\cite{zelaci2021} so that the augmentation experiment tests their
+procedure and not a variant of it. Table~\ref{tab:wgan} gives the configuration.
 
 \begin{table}[h]
 \caption{WGAN-GP configuration used for the augmentation experiments.
@@ -287,8 +291,8 @@ Section~5.2 of the main article attributes the GPR collapse to
 ill-conditioning of $[K + \sigma_n^{2}I]$. If that account is right, the
 collapse should depend on how the inversion is regularised. Table~\ref{tab:gpr}
 tests this by crossing the two available regularisers -- an additive white-noise
-kernel term (WK) and \texttt{scikit-learn}'s explicit jitter $\alpha$ -- against
-real and augmented training data.
+kernel term (WK)~\cite{rasmussen2006} and \texttt{scikit-learn}'s explicit
+jitter $\alpha$ -- against real and augmented training data.
 
 \begin{table}[h]
 \caption{GPR held-out MSE under each combination of regulariser, on real and on

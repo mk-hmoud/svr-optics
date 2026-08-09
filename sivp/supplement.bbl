@@ -1,10 +1,30 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{5}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{{#1}}
 \providecommand{\urlprefix}{URL }
 \providecommand{\doi}[1]{\url{https://doi.org/#1}}
 \providecommand{\eprint}[2][]{\url{#2}}
  \bibcommenthead
+
+\bibitem[{Gulrajani et~al.(2017)Gulrajani, Ahmed, Arjovsky, Dumoulin, and
+  Courville}]{gulrajani2017}
+Gulrajani I, Ahmed F, Arjovsky M, et~al (2017) Improved training of
+  {W}asserstein {GAN}s. In: Advances in Neural Information Processing Systems
+  30
+
+\bibitem[{Rasmussen and Williams(2006)}]{rasmussen2006}
+Rasmussen CE, Williams CKI (2006) Gaussian Processes for Machine Learning. MIT
+  Press, Cambridge, MA
+
+\bibitem[{Smola and Sch{\"o}lkopf(2004)}]{smola2004}
+Smola AJ, Sch{\"o}lkopf B (2004) A tutorial on support vector regression.
+  Statistics and Computing 14(3):199--222.
+  \doi{10.1023/B:STCO.0000035301.49549.88}
+
+\bibitem[{Snoek et~al.(2012)Snoek, Larochelle, and Adams}]{snoek2012}
+Snoek J, Larochelle H, Adams RP (2012) Practical {B}ayesian optimization of
+  machine learning algorithms. In: Advances in Neural Information Processing
+  Systems 25
 
 \bibitem[{Zelaci et~al.(2021)Zelaci, Yasli, Kalyoncu, and Ademgil}]{zelaci2021}
 Zelaci A, Yasli A, Kalyoncu C, et~al (2021) Generative adversarial neural
