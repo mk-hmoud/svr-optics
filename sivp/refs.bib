@@ -31,12 +31,21 @@
   doi     = {10.1371/journal.pone.0330944}
 }
 
-%% NOTE: the SIU paper cited this as "Kizilkaya and Kalyoncu, Determination of
-%% confinement loss characteristics of bent photonic crystal fibers using
-%% k-nearest neighbor regression, Laser Phys. 32(4):045203, 2022". No such paper
-%% is indexed, and no author named Kizilkaya has any PCF publication in
-%% OpenAlex. The paper matching that description is the Heliyon article below,
-%% by Kalyoncu, Yasli and Ademgil. CONFIRM WITH C. KALYONCU BEFORE SUBMISSION.
+%% NOTE: ref [b4] of the SIU paper reads "Y. Kizilkaya and C. Kalyoncu,
+%% Determination of confinement loss characteristics of bent photonic crystal
+%% fibers using k-nearest neighbor regression, Laser Phys. 32(4):045203, 2022".
+%% That entry conflates two real papers by the same group:
+%%
+%%   (a) Kalyoncu, Yasli, Ademgil, Heliyon 8(11):e11582 (2022)
+%%       "Machine learning methods for estimating bent PCF based SPR sensor
+%%        properties" -- proposes k-Nearest Neighbor Regression (KNNR)
+%%   (b) Kizilkaya, Kalyoncu, Yasli, 32nd SIU (2024),
+%%       doi:10.1109/SIU61531.2024.10600773 -- uses Artificial Neural Networks
+%%
+%% [b4] took its author names from (b) and its year and method description from
+%% (a). Since the citing sentence is about k-nearest-neighbour regression, and
+%% (b) is an ANN paper, the intended reference is (a). Resolved from the two
+%% abstracts; worth a confirming glance from C. Kalyoncu, who is on both.
 @article{kalyoncu2022,
   author  = {Kalyoncu, Cem and Yasli, Ahmet and Ademgil, Huseyin},
   title   = {Machine learning methods for estimating bent photonic crystal fiber based {SPR} sensor properties},

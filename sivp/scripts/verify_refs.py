@@ -34,10 +34,28 @@ CROSSREF = "https://api.crossref.org/works"
 OPENALEX = "https://api.openalex.org/works"
 
 
+# Letters that NFKD does not decompose because they are distinct letters rather
+# than accented forms. Turkish dotless i is the one that matters here: without
+# this map "Kizilkaya" and "Kizilkaya" normalise to different strings and a
+# search silently returns nothing. Missing this cost us a real reference once.
+TRANSLIT = str.maketrans({
+    "\u0131": "i", "\u0130": "i",   # dotless i, dotted capital I  (tr)
+    "\u015f": "s", "\u015e": "s",   # s-cedilla                    (tr)
+    "\u011f": "g", "\u011e": "g",   # g-breve                      (tr)
+    "\u00f8": "o", "\u00d8": "o",   # o-slash                      (da/no)
+    "\u0111": "d", "\u0110": "d",   # d-stroke                     (hr/vi)
+    "\u0142": "l", "\u0141": "l",   # l-stroke                     (pl)
+    "\u00df": "ss",                  # sharp s                      (de)
+    "\u00e6": "ae", "\u00c6": "ae",
+    "\u0153": "oe", "\u0152": "oe",
+})
+
+
 def norm(s):
-    """Casefold, strip accents and punctuation, collapse whitespace."""
+    """Casefold, transliterate, strip accents and punctuation, collapse space."""
     if not s:
         return ""
+    s = s.translate(TRANSLIT)
     s = unicodedata.normalize("NFKD", s)
     s = "".join(c for c in s if not unicodedata.combining(c))
     s = re.sub(r"[^a-z0-9 ]", " ", s.lower())
