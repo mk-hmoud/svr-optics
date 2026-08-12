@@ -8,7 +8,7 @@ Nature template for *Signal, Image and Video Processing*.
 | File | What it is |
 |---|---|
 | `main.tex` | Main manuscript. `[iicol]` two-column, 10 pages. |
-| `supplement.tex` | Online Supplement, 7 pages, single column. |
+| `supplement.tex` | Online Supplement, 9 pages, single column (S1-S7). |
 | `refs.bib` | Shared bibliography for both documents. |
 | `sn-jnl.cls`, `sn-*.bst` | Official Springer Nature template files (Dec 2024, v3.1). |
 | `scripts/` | Figure regeneration: one script per figure, plus shared style. |
@@ -37,6 +37,18 @@ python fig2_shap_importance.py     # reads feature_importance_ranking.csv
 python fig3_spectral_response.py   # refits the SVR; ~2 min (--fixed for a fast path)
 python fig4_robustness.py          # reads robustness_volatility_ranking.csv
 python figS1_logo_folds.py         # reads results_comparison_bayesian.csv
+python fig5_timing.py              # reads timing_results.csv
+```
+
+Timing data comes from `benchmark_timing.py`, which must be run one model at a
+time -- loading TensorFlow and torch in the same interpreter gets the process
+OOM-killed:
+
+```
+python benchmark_timing.py --only svr
+python benchmark_timing.py --only gpr  --append
+python benchmark_timing.py --only ann  --append
+python benchmark_timing.py --only wgan --append   # ~14 min
 ```
 
 Run them from `scripts/` with the project venv (`../../venv/bin/python`); paths
@@ -74,4 +86,21 @@ peak shifts (0.2793 / 0.2733, mean 0.2763) exactly.
    `results_comparison_final.csv`. Restore the 52.86 if you can locate its
    source.
 
-See scripts/verify_refs.py: run it before every submission. It checks each refs.bib entry against Crossref/OpenAlex and reports anything that does not match.
+## Before submitting
+
+Run `scripts/verify_refs.py`. It checks every `refs.bib` entry against Crossref
+(by DOI) and OpenAlex (by title) and reports anything that does not match. It
+exits nonzero on failure, so it can gate a submission.
+
+## Page budget
+
+The manuscript sits at exactly 10 pages, which is the SIVP limit, with page 10
+carrying references only (permitted). Two levers hold it there and are the first
+things to relax if content is added:
+
+- `\newcommand{\doi}[1]{}` near the top of `main.tex` suppresses DOIs in the
+  printed reference list. They stay in `refs.bib` for `verify_refs.py`. Deleting
+  that line restores them and costs roughly one page.
+- Spectral validation (Supplement S7), the per-variable robustness figure
+  (Supplement Fig. S3) and the SVR primal formulation (Supplement S1) were moved
+  out of the manuscript for space. Each can come back if something else goes.

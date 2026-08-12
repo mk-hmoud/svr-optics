@@ -43,7 +43,9 @@ hyperparameter search space and its outcome (Sect.~\ref{sup:bayes}), per-fold
 leave-one-geometry-out results (Sect.~\ref{sup:logo}), the generative model
 configuration and the contradiction-search protocol (Sect.~\ref{sup:gan}), a
 Gaussian process kernel and regulariser ablation (Sect.~\ref{sup:gpr}), and the
-complete Monte Carlo tolerance tables (Sect.~\ref{sup:mc}). Section, table,
+complete Monte Carlo tolerance tables (Sect.~\ref{sup:mc}) and the predicted
+spectra underlying the sensitivity quoted in the article
+(Sect.~\ref{sup:spectral}). Section, table,
 figure and equation numbers are prefixed with S; citations refer to the
 reference list of the main article, reproduced here for convenience.}
 
@@ -54,7 +56,7 @@ reference list of the main article, reproduced here for convenience.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Support vector regression: dual formulation}\label{sup:svr}
 
-The main article states the primal problem, Eqs.~(3)--(4). The derivation below
+The main article states the primal objective in Sect.~4.3. The derivation below
 is the standard one~\cite{smola2004}, reproduced here so that the argument of
 Sect.~5.2 of the main article can be followed without a second source.
 Introducing Lagrange multipliers $\alpha_i, \alpha_i^{*} \ge 0$ for the two
@@ -116,13 +118,14 @@ force $\alpha_i = \alpha_i^{*} = 0$ for every sample strictly inside the
 $\epsilon$-tube. The expansion in \eqref{eq:prediction} is therefore supported
 only by samples on or outside the tube boundary. On this dataset that
 concentrates the fit near the resonance transition, where the response is
-steepest, and it is why the model tolerates a training set of 432 samples.
+steepest, which accounts for the model's tolerance of a 432-sample training
+set.
 
 Condition \eqref{eq:kkt} also explains the contrast with Gaussian process
 regression~\cite{rasmussen2006} in Sect.~5.2 of the main article. A pair of near-duplicate inputs
-carrying contradictory targets simply saturates at $\alpha_i = C$: both points
-become bounded support vectors, the fitted function is worse, but nothing in
-\eqref{eq:dual} becomes ill-posed. There is no matrix to invert.
+carrying contradictory targets saturates at $\alpha_i = C$: both points become
+bounded support vectors and the fitted function is degraded, but nothing in
+\eqref{eq:dual} becomes ill-posed, since no matrix inversion is involved.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Bayesian optimisation of the SVR hyperparameters}\label{sup:bayes}
@@ -208,14 +211,14 @@ of the nine folds move to the right, that is, get worse under
 augmentation.}\label{fig:logo}
 \end{figure}
 
-The per-fold view supports a claim the averages cannot. Augmentation is not a
-uniform penalty: it is nearly neutral on D3 and D4, mildly helpful on D5, and
-catastrophic on D8, where the error grows by a factor of 23. This is the
-signature of synthetic samples that contradict specific regions of the design
-space rather than of noise added evenly across it. D5 is the only fold where
-augmentation helps, and it is also the fold with the worst real-only error --
-consistent with extra samples helping only where the real coverage was
-genuinely thin.
+The per-fold view supports a conclusion the averages cannot. Augmentation is not
+a uniform penalty: it is nearly neutral on D3 and D4, beneficial on D5, and
+severe on D8, where the error grows by a factor of 23. This is the signature of
+synthetic samples that contradict specific regions of the design space, rather
+than of noise added evenly across it. D5 is the only fold on which augmentation
+helps, and it is also the fold with the highest real-only error, which is
+consistent with additional samples helping only where real coverage was
+genuinely sparse.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Generative model and contradiction search}\label{sup:gan}
@@ -322,10 +325,10 @@ introduced.
 
 On augmented data the picture inverts: every configuration lands near 69,
 regardless of regulariser. Once the contradictory pairs of Sect.~\ref{sup:gan}
-are present, no choice of regularisation recovers a usable model, because the
-problem is no longer conditioning of an otherwise well-posed system but a
-training set that asks for two different outputs at effectively the same input.
-The regulariser can absorb noise; it cannot absorb contradiction.
+are present, no choice of regularisation recovers a usable model. The problem is
+no longer the conditioning of an otherwise well-posed system, but a training set
+requiring two different outputs at effectively the same input. Regularisation can
+accommodate noise; it cannot accommodate contradiction.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Monte Carlo tolerance analysis}\label{sup:mc}
@@ -380,6 +383,19 @@ is why it need not reproduce the simultaneous-perturbation jitter of the upper
 panel.}
 \end{table}
 
+Figure~\ref{fig:robustness} completes the tolerance analysis of
+Sect.~\ref{sup:mc}, showing the per-variable decomposition summarised in the
+lower panel of Table~\ref{tab:mc}.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.60\textwidth]{figs/fig4_robustness.pdf}
+\caption{Resonance jitter attributable to each geometric variable at 3\%
+tolerance, on a logarithmic scale. The lattice pitch (highlighted) dominates by
+more than a factor of five over the next variable and by two orders of magnitude
+over the innermost holes.}\label{fig:robustness}
+\end{figure}
+
 \subsection{Limitation of the peak-detection step}
 
 The peak spread in Table~\ref{tab:mc} is 2.964--3.000, against a wavelength grid
@@ -395,6 +411,32 @@ two-orders-of-magnitude separation between $\Lambda$ and $d_1$ is far larger
 than the effect could plausibly manufacture. We report the numbers as published
 and flag the limitation; a peak finder that rejects boundary maxima, or a wider
 wavelength grid, would be needed before treating the magnitudes as calibrated.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Spectral validation}\label{sup:spectral}
+
+Aggregate error statistics can conceal a surrogate that is accurate on average
+yet incorrect in spectral shape. As a physical check, the trained SVR was swept
+across the full wavelength range at fixed geometry for each analyte and the
+predicted spectra examined directly (Fig.~\ref{fig:spectral}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figs/fig3_spectral_response.pdf}
+\caption{Predicted confinement-loss spectra at fixed geometry for the three
+analyte indices. Rings mark the predicted resonance. The peak moves
+monotonically to longer wavelengths as $n_a$ increases, in uniform steps of
+0.276 dataset units per 0.01 refractive index unit.}\label{fig:spectral}
+\end{figure}
+
+The surrogate reproduces the expected behaviour: a single well-formed resonance
+shifting monotonically to longer wavelengths as the analyte index rises from
+1.33 to 1.35, in near-uniform steps of 0.279 and 0.273 dataset units. The
+phase-matching condition was never supplied to the model, so recovery of both
+the direction and the regularity of this shift indicates that the underlying
+coupling has been captured rather than the training spectra memorised. The corresponding
+sensitivity is 27.63 per refractive index unit in the units of the source
+dataset.
 
 \bibliography{refs}
 
