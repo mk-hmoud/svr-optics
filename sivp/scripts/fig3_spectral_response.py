@@ -18,9 +18,10 @@ tab10 cycle, a boxed frame, a dashed vertical rule per peak and a red cross:
     (the palette carries a sub-3:1 contrast slot, which obliges visible labels)
   * y-axis limits tightened to the resonance region; box frame removed
 
-NOTE ON UNITS: the `lambda` column of data.xlsx is plotted in its native
-dataset units, matching how the peak shift and sensitivity are reported in the
-manuscript.  See the units caveat flagged in the manuscript source.
+NOTE ON UNITS: the `lambda` column of data.xlsx is in units of 100 nm and is
+converted to nanometres here.  Confirmed by the Sellmeier index of fused silica,
+which over 500-800 nm gives n = 1.462-1.453, matching the dataset's Re(n_eff) of
+1.42-1.46; at 5-8 um it gives 1.34-0.64 and at 5-8 nm about 1.0.
 
 NOTE ON REPRODUCIBILITY: src/sensitivity.py imports `train_best_svr_bayesian`
 from src/evaluate_logo.py, but that function is absent from the current working
@@ -109,6 +110,7 @@ def main(out, fixed):
 
     base_config = df[CONFIG_COLS].iloc[0].to_dict()
     analytes = sorted(df["Analyte"].unique())
+    NM = 100.0  # dataset lambda unit -> nanometres
     wl = np.linspace(df["lambda"].min(), df["lambda"].max(), 1000)
 
     fig, ax = plt.subplots(figsize=(COLUMN_W, 2.55))
@@ -122,7 +124,7 @@ def main(out, fixed):
 
         colour = CATEGORICAL[i % len(CATEGORICAL)]
         ax.plot(
-            wl,
+            wl * NM,
             pred,
             color=colour,
             linewidth=1.4,
@@ -130,7 +132,7 @@ def main(out, fixed):
             zorder=3,
         )
         ax.plot(
-            wl[::80],
+            wl[::80] * NM,
             pred[::80],
             linestyle="none",
             marker=MARKERS[i % len(MARKERS)],
@@ -142,9 +144,9 @@ def main(out, fixed):
         )
 
         k = int(np.argmax(pred))
-        peaks.append((wl[k], pred[k]))
+        peaks.append((wl[k] * NM, pred[k]))
         ax.plot(
-            wl[k],
+            wl[k] * NM,
             pred[k],
             marker="o",
             markersize=6.5,
@@ -157,7 +159,7 @@ def main(out, fixed):
         # separated -- identity never rests on hue alone.
         ax.annotate(
             f"$n_a = {analyte:.2f}$",
-            xy=(wl[-1], pred[-1]),
+            xy=(wl[-1] * NM, pred[-1]),
             xytext=(4, -1),
             textcoords="offset points",
             ha="left",
@@ -165,15 +167,16 @@ def main(out, fixed):
             fontsize=7.5,
             color=colour,
         )
-        print(f"analyte {analyte}: predicted resonance at lambda = {wl[k]:.4f}")
+        print(f"analyte {analyte}: resonance at {wl[k]*NM:.2f} nm")
 
     shifts = np.diff([p[0] for p in peaks])
-    print("peak shifts:", np.round(shifts, 4), "mean:", round(shifts.mean(), 4))
+    print("peak shifts (nm):", np.round(shifts, 2), "mean:", round(shifts.mean(), 2))
+    print(f"sensitivity: {shifts.mean()/0.01:.0f} nm/RIU")
 
-    ax.set_xlim(4.85, 9.05)
+    ax.set_xlim(485, 905)
     ax.set_ylim(6.55, 7.52)
-    ax.set_xticks([5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0])
-    ax.set_xlabel(r"Wavelength $\lambda$ (dataset units)", color=INK)
+    ax.set_xticks([500, 550, 600, 650, 700, 750, 800])
+    ax.set_xlabel(r"Wavelength $\lambda$ (nm)", color=INK)
     ax.set_ylabel(r"$\log_{10}(L_c \times 10^{8})$", color=INK)
 
     # One annotation for the whole redshift, instead of a rule per curve.

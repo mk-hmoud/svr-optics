@@ -1,4 +1,4 @@
-\begin{thebibliography}{5}
+\begin{thebibliography}{6}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{{#1}}
 \providecommand{\urlprefix}{URL }
@@ -11,6 +11,11 @@
 Gulrajani I, Ahmed F, Arjovsky M, et~al (2017) Improved training of
   {W}asserstein {GAN}s. In: Advances in Neural Information Processing Systems
   30
+
+\bibitem[{Hammoud et~al.(2026)Hammoud, Kalyoncu, and Yasli}]{hammoud2026siu}
+Hammoud MK, Kalyoncu C, Yasli A (2026) High-efficiency confinement loss
+  prediction via support vector regression. In: Proceedings of the 34th IEEE
+  Signal Processing and Communications Applications Conference (SIU)
 
 \bibitem[{Rasmussen and Williams(2006)}]{rasmussen2006}
 Rasmussen CE, Williams CKI (2006) Gaussian Processes for Machine Learning. MIT

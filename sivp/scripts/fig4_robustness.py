@@ -2,19 +2,20 @@
 
 New artwork for the journal version: the conference paper reported these Monte
 Carlo numbers in running text only.  Source data is
-`robustness_volatility_ranking.csv`, the numeric output of src/robustness.py.
+`robustness_guarded_results.csv`, the output of scripts/robustness_guarded.py.
 
 Rendered as a Cleveland dot plot on a logarithmic axis rather than another bar
 chart, so it does not read as a repeat of Fig. 2, and so the 160x spread between
 the pitch and the innermost hole stays legible.  The dominant contributor is the
 only mark carrying the accent colour; everything else is the single series hue.
 
-CAVEAT (flagged, not fixed): src/robustness.py locates the resonance by argmax
-over a bounded wavelength grid.  In robustness_summary.csv the peak range is
-2.96 against a 3.0-wide grid, i.e. the argmax is landing on the grid boundary in
-a large fraction of trials, so these volatilities are an upper bound rather than
-a clean resonance-tracking result.  The figure reproduces the published numbers
-as-is; guard the peak finder against boundary hits before treating them as final.
+SUPERSEDES the published numbers.  src/robustness.py evaluated at a baseline
+three of whose four geometric values lie outside the sampled design space (the
+Fig. 1 radii written into diameter columns, and a pitch in um written into a
+column stored in units of 10 um), so the surrogate was extrapolating and its
+argmax peak finder returned grid endpoints.  These values come from a re-run at a
+sampled geometry with a boundary guard: 0/100 trials rejected at every level.
+Wavelength is in nanometres (the lambda column is in units of 100 nm).
 
 Usage:  python fig4_robustness.py [--out ../figs/fig4_robustness.pdf]
 """
@@ -37,7 +38,7 @@ from sivp_style import (
 )
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_SRC = os.path.join(HERE, "..", "..", "robustness_volatility_ranking.csv")
+DEFAULT_SRC = os.path.join(HERE, "..", "..", "robustness_guarded_results.csv")
 DEFAULT_OUT = os.path.join(HERE, "..", "figs", "fig4_robustness.pdf")
 
 SYMBOLS = {
@@ -52,7 +53,9 @@ def main(src, out):
     apply_style()
 
     df = pd.read_csv(src)
-    df["label"] = df["Feature"].map(SYMBOLS).fillna(df["Feature"])
+    df = df[df["variable"] != "all"].copy()
+    df["label"] = df["variable"].map(SYMBOLS).fillna(df["variable"])
+    df = df.rename(columns={"jitter_nm": "Volatility_nm"})
     df = df.sort_values("Volatility_nm").reset_index(drop=True)
 
     top = df["Volatility_nm"].idxmax()
@@ -82,7 +85,7 @@ def main(src, out):
         ax.text(
             v * 1.35,
             i,
-            f"{v:.3f}",
+            f"{v:.2f}",
             va="center",
             ha="left",
             fontsize=7.5,
@@ -90,10 +93,10 @@ def main(src, out):
         )
 
     ax.set_xscale("log")
-    ax.set_xlim(2e-3, 4.0)
+    ax.set_xlim(0.1, 40.0)
     ax.set_yticks(df.index)
     ax.set_yticklabels(df["label"], fontsize=9, color=INK)
-    ax.set_xlabel("Resonance jitter, std (dataset units)", color=INK)
+    ax.set_xlabel("Resonance jitter, std (nm)", color=INK)
     ax.grid(axis="x")
     ax.grid(axis="y", visible=False)
     ax.tick_params(axis="y", length=0)

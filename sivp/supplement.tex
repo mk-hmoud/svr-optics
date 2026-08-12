@@ -43,7 +43,7 @@ hyperparameter search space and its outcome (Sect.~\ref{sup:bayes}), per-fold
 leave-one-geometry-out results (Sect.~\ref{sup:logo}), the generative model
 configuration and the contradiction-search protocol (Sect.~\ref{sup:gan}), a
 Gaussian process kernel and regulariser ablation (Sect.~\ref{sup:gpr}), and the
-complete Monte Carlo tolerance tables (Sect.~\ref{sup:mc}) and the predicted
+corrected Monte Carlo tolerance tables (Sect.~\ref{sup:mc}) and the predicted
 spectra underlying the sensitivity quoted in the article
 (Sect.~\ref{sup:spectral}). Section, table,
 figure and equation numbers are prefixed with S; citations refer to the
@@ -335,17 +335,37 @@ accommodate noise; it cannot accommodate contradiction.
 
 \subsection{Protocol}
 
-The baseline configuration is the nominal design of Table~1 of the main article
-at analyte index 1.33. For each tolerance level $\sigma \in \{1\%, 3\%, 5\%\}$
-we drew 100 perturbed geometries, adding to each geometric variable $v$ a
-Gaussian perturbation of standard deviation $\sigma v$, and located the
-predicted resonance by taking the argmax of the surrogate prediction over a
-500-point wavelength grid spanning the dataset range. The reported jitter is the
-standard deviation of the resulting peak positions.
+The baseline is the first sampled configuration of the dataset
+($\Lambda = 0.24$, $d_1 = 0.25$, $d_2 = 0.75$, $d_3 = 0.35$ in dataset column
+units) at analyte index 1.33. For each tolerance level
+$\sigma \in \{1\%, 3\%, 5\%\}$ we drew 100 perturbed geometries, adding to each
+geometric variable $v$ a Gaussian perturbation of standard deviation $\sigma v$,
+and located the predicted resonance as the argmax of the surrogate prediction
+over a 500-point wavelength grid spanning 500--800\,nm. Any trial whose argmax
+fell in the outermost 2\% of the grid was discarded as a boundary artefact
+rather than a resonance. The reported jitter is the standard deviation of the
+surviving peak positions. Per-variable volatilities were obtained by repeating
+the procedure at $\sigma = 3\%$ with one variable perturbed at a time.
 
-Per-variable volatilities were obtained by repeating the procedure at
-$\sigma = 3\%$ with one variable perturbed at a time and the rest held at
-nominal.
+\subsection{Correction to the published values}\label{sup:mc_correction}
+
+These values supersede those in~\cite{hammoud2026siu}. The published run
+evaluated at $\Lambda = 2.0$, $d_1 = 0.225$, $d_2 = 0.375$, $d_3 = 0.175$. Three
+of those four lie outside the sampled design space, which spans
+$\Lambda \in [0.15, 0.24]$, $d_1 \in [0.25, 0.45]$ and $d_2 \in [0.55, 0.75]$:
+the values $0.225$, $0.375$ and $0.175$ are the hole \emph{radii}
+$r_1$, $r_2$, $r_3$ of Fig.~1 of the main article entered into \emph{diameter}
+columns, and $2.0$ is the lattice pitch in micrometres entered into a column
+whose own unit is ten micrometres.
+
+The surrogate was therefore extrapolating well outside its training envelope,
+where it has no interior resonance to find, and the unguarded argmax returned
+grid endpoints in roughly half of all trials. That is what produced the
+published peak spread of 2.96 against a 3.00-wide grid. Re-evaluated at a
+sampled geometry the degeneracy disappears entirely: no trial is rejected at any
+tolerance level. The qualitative conclusion is unchanged and in fact sharpens,
+the pitch accounting for 98.8\% of the variance in peak position against 95.1\%
+before; the magnitudes fall by roughly a factor of eighteen.
 
 \subsection{Results}
 
@@ -355,62 +375,47 @@ attributes that scatter to individual variables.
 
 \begin{table}[!ht]
 \caption{Monte Carlo peak scatter at each tolerance level, and the per-variable
-decomposition at 3\%. Both panels report the standard deviation of the predicted
-resonance position in the native wavelength units of the source
-dataset.}\label{tab:mc}
+decomposition at 3\%, evaluated at a sampled geometry with a boundary-guarded
+peak search. All values are standard deviations of the predicted resonance
+position in nanometres.}\label{tab:mc}
 \begin{tabular*}{\textwidth}{@{\extracolsep\fill}lccc}
 \toprule
 \multicolumn{4}{l}{\emph{All variables perturbed simultaneously}} \\
 \midrule
 Tolerance level      & 1\%  & 3\%  & 5\%  \\
-Peak jitter (std)    & 1.028 & 1.270 & 1.338 \\
-Peak spread (range)  & 2.964 & 3.000 & 3.000 \\
+Peak jitter (std)    & 2.32\,nm & 7.18\,nm & 10.11\,nm \\
+Trials rejected      & 0/100 & 0/100 & 0/100 \\
 \midrule
 \multicolumn{4}{l}{\emph{One variable at a time, 3\% tolerance}} \\
 \midrule
 Variable    & Jitter (std) & Share of variance & Rank \\
-$\Lambda$   & 1.231 & 95.1\% & 1 \\
-$d_2$       & 0.244 &  3.7\% & 2 \\
-$d_3$       & 0.139 &  1.2\% & 3 \\
-$d_1$       & 0.008 & $<0.1\%$ & 4 \\
+$\Lambda$   & 5.49\,nm & 98.8\% & 1 \\
+$d_1$       & 0.43\,nm &  0.6\% & 2 \\
+$d_2$       & 0.38\,nm &  0.5\% & 3 \\
+$d_3$       & 0.22\,nm &  0.2\% & 4 \\
 \botrule
 \end{tabular*}
 \footnotetext{Shares are of total variance, $\sigma_i^2/\sum_j\sigma_j^2$, since
-variances rather than standard deviations are additive; this is the basis on
-which the pitch is said to account for over 90\% of the jitter in Sect.~5.4 of
-the main article. The decomposition ignores interaction between variables, which
-is why it need not reproduce the simultaneous-perturbation jitter of the upper
-panel.}
+variances rather than standard deviations are additive. The decomposition
+ignores interaction between variables, which is why it need not reproduce the
+simultaneous-perturbation jitter of the upper panel. The three hole diameters
+are separated by less than the Monte Carlo error at 100 trials, so their
+relative ranking should not be read as significant.}
 \end{table}
 
-Figure~\ref{fig:robustness} completes the tolerance analysis of
-Sect.~\ref{sup:mc}, showing the per-variable decomposition summarised in the
-lower panel of Table~\ref{tab:mc}.
+Figure~\ref{fig:robustness} shows the per-variable decomposition of the lower
+panel of Table~\ref{tab:mc} graphically, on a logarithmic scale.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.60\textwidth]{figs/fig4_robustness.pdf}
 \caption{Resonance jitter attributable to each geometric variable at 3\%
-tolerance, on a logarithmic scale. The lattice pitch (highlighted) dominates by
-more than a factor of five over the next variable and by two orders of magnitude
-over the innermost holes.}\label{fig:robustness}
+tolerance, on a logarithmic scale. The lattice pitch (highlighted) exceeds the
+largest hole-diameter contribution by more than an order of magnitude.
+Evaluated at a sampled geometry with a boundary-guarded peak
+search.}\label{fig:robustness}
 \end{figure}
 
-\subsection{Limitation of the peak-detection step}
-
-The peak spread in Table~\ref{tab:mc} is 2.964--3.000, against a wavelength grid
-that spans 3.000 units in total. A spread equal to the width of the search
-interval means the argmax is reaching the grid boundary in a substantial
-fraction of trials rather than tracking an interior resonance, and each such
-trial contributes a saturated rather than a physical peak position.
-
-The consequence is that the jitter magnitudes in Table~\ref{tab:mc} are upper
-bounds. The variable ranking is more robust than the magnitudes, since boundary
-saturation affects all four variables under the same protocol, and the
-two-orders-of-magnitude separation between $\Lambda$ and $d_1$ is far larger
-than the effect could plausibly manufacture. We report the numbers as published
-and flag the limitation; a peak finder that rejects boundary maxima, or a wider
-wavelength grid, would be needed before treating the magnitudes as calibrated.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Spectral validation}\label{sup:spectral}

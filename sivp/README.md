@@ -64,23 +64,7 @@ peak shifts (0.2793 / 0.2733, mean 0.2763) exactly.
 
 ## Open items for the authors
 
-1. **Wavelength units.** The `lambda` column of `data/data.xlsx` runs 5.0–8.0.
-   Silica/gold SPR physics puts this resonance at 500–800 nm, so the column looks
-   like units of 100 nm. If that is right, the sensitivity is ~2763 nm/RIU, not
-   the 27.63 nm/RIU printed in the conference paper — a factor of 100 — and the
-   Monte Carlo jitter is ~127 nm, not 1.27 nm. The conference values are
-   reproduced here unchanged and all wavelength-derived quantities are stated in
-   dataset units; see the flagged comment block in `main.tex` above
-   Sect. 5.5. Resolve before submission.
-
-2. **Monte Carlo peak detection.** `src/robustness.py` finds the resonance by
-   `argmax` over a bounded grid. The recorded peak range is 2.96 against a
-   3.0-wide grid, so the argmax is hitting the grid boundary in many trials. The
-   manuscript reports the numbers as published and flags them as upper bounds
-   (Sect. 5.4 and Supplement S6.3). A boundary-rejecting peak finder would settle
-   it.
-
-3. **Dropped claim.** The conference paper reported a GPR+GAN LOGO average of
+1. **Dropped claim.** The conference paper reported a GPR+GAN LOGO average of
    52.86. No file in the repo reproduces that figure, so the journal version
    reports only the fixed-partition value of 23.844 from
    `results_comparison_final.csv`. Restore the 52.86 if you can locate its
@@ -88,6 +72,19 @@ peak shifts (0.2793 / 0.2733, mean 0.2763) exactly.
 
 ### Closed
 
+- **Wavelength units.** Confirmed: the `lambda` column is in units of 100 nm.
+  Verified independently against the Sellmeier index of fused silica (n =
+  1.462–1.453 over 500–800 nm vs the dataset's Re(n_eff) of 1.42–1.46). The SIU
+  paper's "27.63 nm/RIU" had the right number and the wrong unit: 27.63 nm is
+  the shift per 0.01 RIU, so the sensitivity is **2763 nm/RIU**. Applied
+  throughout.
+- **Monte Carlo.** Corrected. `src/robustness.py` evaluated at a baseline three
+  of whose four values were outside the sampled design space (Fig. 1 radii in
+  diameter columns; pitch in µm in a column whose unit is 10 µm), so the
+  surrogate extrapolated and the argmax returned grid endpoints. Re-run at a
+  sampled geometry with a boundary guard via `scripts/robustness_guarded.py`:
+  jitter 2.3/7.2/10.1 nm at 1/3/5%, pitch 98.8% of variance, 0/100 rejected.
+  Supersedes the published values; see Supplement S6.2.
 - `hammoud2026siu` "34th SIU" ordinal: confirmed correct by the authors.
 - `kalyoncu2022`: confirmed by C. Kalyoncu as the paper SIU ref [b4] intended.
   Note that [b4] is erroneous as printed in the proceedings.

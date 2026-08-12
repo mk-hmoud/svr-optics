@@ -71,7 +71,8 @@ apart in scaled feature space yet differ by 0.168 in log-scaled loss, driving th
 covariance matrix towards singularity. Shapley attribution identifies the outer
 cladding holes as the dominant control on confinement loss, and a Monte Carlo
 study identifies the lattice pitch as the dominant source of resonance
-instability under fabrication error. Timing measurements show the generative
+instability under fabrication error, at 98.8\% of the variance in peak
+position. Timing measurements show the generative
 route to be the most expensive stage of the pipeline while reducing accuracy. The
 resulting surrogate is interpretable, trains in under a minute, and needs 70\%
 less simulation data than comparable neural approaches.}
@@ -337,8 +338,11 @@ $d_c$      & central defect  & 0.15 (fixed) \\
 $L_c$      & target          & $10^{-3}$--$59.1$\,dB/cm \\
 \botrule
 \end{tabular*}
-\footnotetext{Geometric values in \textmu m; $\lambda$ is retained in the native
-units of the source dataset.}
+\footnotetext{Geometric values are the dataset's own column values. The
+$\lambda$ column is in units of 100 nm, so the 16-point grid spans
+500--800\,nm; the Sellmeier index of fused silica over that span,
+$n = 1.462$--$1.453$, matches the dataset's $\mathrm{Re}(n_\mathrm{eff})$ of
+1.42--1.46.}
 \end{table}
 
 The target spans nearly five orders of magnitude and is dominated by the
@@ -628,40 +632,35 @@ inputs were perturbed with Gaussian noise at 1\%, 3\% and 5\% relative standard
 deviation, 100 Monte Carlo trials were run at each level, and the induced
 scatter in the predicted resonance wavelength was recorded. The experiment was
 then repeated perturbing one variable at a time in order to attribute that
-scatter. Peak jitter grows from 1.03 to 1.34 dataset units between the 1\% and
-5\% levels; the complete tables and the per-variable decomposition are given in
-the Online Supplement, Sect.~S6.
+scatter. Peak jitter grows from 2.3\,nm at 1\% tolerance to 10.1\,nm at 5\%;
+the complete tables are given in the Online Supplement, Sect.~S6.
 
-The pitch $\Lambda$ dominates, accounting for over 90\% of the observed
-variance in peak position, while $d_1$ contributes a negligible share. This
-establishes a fabrication priority: pitch uniformity along the drawn fiber
-governs whether a device matches its calibration, whereas tolerance on the
-smallest cladding holes may be relaxed without appreciable spectral cost.
+The pitch $\Lambda$ dominates, contributing 5.49\,nm of jitter and 98.8\% of
+the variance in peak position, while the three hole diameters together
+contribute under 0.7\,nm. This establishes a fabrication priority: pitch
+uniformity along the drawn fiber governs whether a device matches its
+calibration, whereas tolerance on the cladding holes may be relaxed without
+appreciable spectral cost.
 
-Two limitations qualify these values. First, the observed peak spread nearly
-equals the width of the wavelength grid itself, which indicates that the
-peak-detection step reaches the grid boundary in a substantial fraction of
-trials. The jitter values should therefore be
-interpreted as upper bounds and as a ranking rather than as calibrated
-magnitudes. Second, the analysis perturbs the surrogate inputs only, and
+Two points qualify these values. First, they supersede the corresponding figures
+in~\cite{hammoud2026siu}, which were computed at a baseline geometry lying
+outside the sampled design space of Table~\ref{tab:design}; the surrogate was
+there extrapolating, and the resulting peak search returned grid endpoints in
+roughly half of all trials. The values above are obtained at a sampled geometry
+with a boundary-guarded peak search, under which no trial is rejected at any
+tolerance level. Second, the analysis perturbs the surrogate inputs only, and
 therefore propagates geometric tolerance but not the predictive error of the
 surrogate itself.
 
 % ---------------------------------------------------------------------------
-% FLAGGED FOR THE AUTHORS -- units, carried over unchanged from the SIU paper.
+% UNITS -- RESOLVED.  The `lambda' column of data.xlsx is in units of 100 nm,
+% confirmed by the authors and independently by the Sellmeier index of fused
+% silica: over 500-800 nm it gives n = 1.462-1.453, matching the dataset's
+% Re(n_eff) of 1.42-1.46, whereas 5-8 um gives 1.34-0.64 and 5-8 nm gives ~1.0.
 %
-% The `lambda' column of data.xlsx runs 5.0-8.0.  Silica/gold SPR physics puts
-% this resonance at 500-800 nm, i.e. the column is in units of 100 nm.  If so,
-% the 0.2763 peak shift per 0.01 RIU step is 27.63 nm per 0.01 RIU, and the
-% sensitivity is ~2763 nm/RIU -- not the 27.63 nm/RIU printed in the SIU paper,
-% which is off by 100x.  27.63 nm/RIU would also be implausibly low for a
-% PCF-SPR sensor.  The same factor applies to the Table 5 jitter figures
-% (1.27 -> 127 nm; see Supplement Table S5).
-%
-% Per author instruction the conference values are reproduced here unchanged and
-% wavelength-derived quantities are stated in dataset units.  Resolve before
-% submission: either confirm the unit convention and rescale, or state the
-% convention explicitly in Sect. 4.1.
+% The SIU paper printed "27.63 nm/RIU".  The number 27.63 is correct as a peak
+% shift in nm per 0.01 RIU step; the unit label was wrong.  The sensitivity is
+% 2763 nm/RIU, which this article reports.
 % ---------------------------------------------------------------------------
 
 \subsection{Computational cost}\label{sec:timing}
@@ -700,9 +699,8 @@ Aggregate error statistics can conceal a surrogate that is accurate on average
 yet incorrect in spectral shape. Sweeping the trained SVR across the full
 wavelength range at fixed geometry reproduces the expected behaviour: a single
 well-formed resonance shifting monotonically to longer wavelengths as the
-analyte index rises from 1.33 to 1.35, in near-uniform steps of 0.279 and 0.273
-dataset units, giving a sensitivity of 27.63 per refractive index unit in the
-units of the source dataset. The phase-matching condition was never supplied to
+analyte index rises from 1.33 to 1.35, in near-uniform steps of 27.93 and
+27.33\,nm, giving a spectral sensitivity of 2763\,nm/RIU. The phase-matching condition was never supplied to
 the model, so recovery of both the direction and the regularity of this shift
 indicates that the underlying coupling has been captured rather than the
 training spectra memorised. The predicted spectra are shown in the Online
