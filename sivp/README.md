@@ -86,6 +86,12 @@ peak shifts (0.2793 / 0.2733, mean 0.2763) exactly.
    `results_comparison_final.csv`. Restore the 52.86 if you can locate its
    source.
 
+### Closed
+
+- `hammoud2026siu` "34th SIU" ordinal: confirmed correct by the authors.
+- `kalyoncu2022`: confirmed by C. Kalyoncu as the paper SIU ref [b4] intended.
+  Note that [b4] is erroneous as printed in the proceedings.
+
 ## Before submitting
 
 Run `scripts/verify_refs.py`. It checks every `refs.bib` entry against Crossref
