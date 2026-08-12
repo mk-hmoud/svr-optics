@@ -1,0 +1,8 @@
+level,variable,jitter_nm,rejected
+1%,all,2.316,0
+3%,all,7.184,0
+5%,all,10.106,0
+3%,Pitch (um),5.494,0
+3%,d1 (um),0.425,0
+3%,d2 (um),0.383,0
+3%,d3 (um),0.22,0
