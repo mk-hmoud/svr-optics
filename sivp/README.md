@@ -64,13 +64,19 @@ peak shifts (0.2793 / 0.2733, mean 0.2763) exactly.
 
 ## Open items for the authors
 
-1. **Dropped claim.** The conference paper reported a GPR+GAN LOGO average of
-   52.86. No file in the repo reproduces that figure, so the journal version
-   reports only the fixed-partition value of 23.844 from
-   `results_comparison_final.csv`. Restore the 52.86 if you can locate its
-   source.
+None outstanding.
 
 ### Closed
+
+- **GPR+GAN LOGO average (52.86).** Restored to Table 3 on the authors'
+  instruction, cited to the SIU paper. The computation lives in
+  `src/evaluate_logo_gpr_gan.py`, which was never deleted -- only its output CSV
+  was missing, which is why nothing appeared to produce the number.
+  `scripts/rerun_gpr_gan_logo.py` is a resumable re-implementation; a partial
+  run (7 of 9 folds, `results_logo_gpr_gan.csv`) gives a mean of 50.81 against
+  the published 52.86. That is corroboration, not reproduction: the generator is
+  retrained per fold with no fixed seed, so folds scatter 32.7--76.1 (sd 16.4).
+  Run the script to completion if a referee asks for the full nine folds.
 
 - **Wavelength units.** Confirmed: the `lambda` column is in units of 100 nm.
   Verified independently against the Sellmeier index of fused silica (n =

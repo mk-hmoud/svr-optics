@@ -516,13 +516,17 @@ Model & Real only & Augmented & Change \\
 \midrule
 SVR & 0.121 & 0.197 & $+63\%$ \\
 GPR & 0.185 & 23.844 & collapse \\
+GPR (LOGO) & --- & 52.86 & collapse \\
 \midrule
 Deep network~\cite{zelaci2021} & 0.894 & 0.314 & $-65\%$ \\
 \botrule
 \end{tabular*}
-\footnotetext{Fixed-partition MSE. The neural row is reproduced
-from~\cite{zelaci2021} for contrast: the same synthetic samples that help a
-data-starved network harm both kernel models.}
+\footnotetext{Fixed-partition MSE except where marked. The GPR
+leave-one-geometry-out mean is carried from~\cite{hammoud2026siu}; the
+generator is retrained per fold, so fold-level values scatter widely
+(32.7--76.1 in a partial re-run) and the mean is the stable quantity. The
+neural row is reproduced from~\cite{zelaci2021} for contrast: the same
+synthetic samples that help a data-starved network harm both kernel models.}
 \end{table}
 
 The GPR failure is the informative case, because it is not a gradual degradation
