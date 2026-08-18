@@ -47,3 +47,10 @@ for doc in main ESM_1; do
   printf '%-12s %s pages\n' "$doc" "$(pdfinfo "$doc.pdf" | awk '/^Pages/{print $2}')"
 done
 rm -f *.aux *.log *.out *.blg *-eps-converted-to.pdf
+
+# Snapp takes the manuscript as a .zip of LaTeX source and compiles it itself,
+# so the archive must build standalone. ESM_1 is deliberately excluded -- a
+# second \documentclass in the same archive would confuse their compiler; it is
+# uploaded as supplementary material instead.
+zip -q manuscript.zip main.tex main.bbl refs.bib sn-jnl.cls sn-basic.bst Fig2.eps Fig3.eps
+echo "manuscript.zip  $(unzip -l manuscript.zip | tail -1 | awk '{print $2}') files"
