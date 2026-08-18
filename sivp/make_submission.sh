@@ -11,20 +11,25 @@ cd "$(dirname "$0")"
 OUT=submission
 rm -rf "$OUT"; mkdir -p "$OUT"
 
+# EPS, not PDF: Snapp accepts PNG, JPEG, SVG or EPS and does not list PDF, and
+# the artwork guidelines name EPS as the preferred vector format. pdflatex reads
+# EPS via epstopdf, which the class already pulls in through graphicx.
 # printed number -> source file
-cp figs/fig2_shap_importance.pdf  "$OUT/Fig2.pdf"   # main   Fig. 2
-cp figs/fig5_timing.pdf           "$OUT/Fig3.pdf"   # main   Fig. 3
-cp figs/figS1_logo_folds.pdf      "$OUT/FigS1.pdf"  # ESM_1  Fig. S1
-cp figs/fig4_robustness.pdf       "$OUT/FigS2.pdf"  # ESM_1  Fig. S2
-cp figs/fig3_spectral_response.pdf "$OUT/FigS3.pdf" # ESM_1  Fig. S3
+cp figs/fig2_shap_importance.eps   "$OUT/Fig2.eps"   # main   Fig. 2
+cp figs/fig5_timing.eps            "$OUT/Fig3.eps"   # main   Fig. 3
+cp figs/figS1_logo_folds.eps       "$OUT/FigS1.eps"  # ESM_1  Fig. S1
+cp figs/fig4_robustness.eps        "$OUT/FigS2.eps"  # ESM_1  Fig. S2
+cp figs/fig3_spectral_response.eps "$OUT/FigS3.eps"  # ESM_1  Fig. S3
 # Fig. 1 is inline TikZ and has no file.
 
 # Rewrite the \includegraphics paths to the renamed files.
-sed -e 's|figs/fig2_shap_importance\.pdf|Fig2.pdf|' \
-    -e 's|figs/fig5_timing\.pdf|Fig3.pdf|' main.tex > "$OUT/main.tex"
-sed -e 's|figs/figS1_logo_folds\.pdf|FigS1.pdf|' \
-    -e 's|figs/fig4_robustness\.pdf|FigS2.pdf|' \
-    -e 's|figs/fig3_spectral_response\.pdf|FigS3.pdf|' supplement.tex > "$OUT/ESM_1.tex"
+sed -e 's|figs/fig2_shap_importance\.pdf|Fig2.eps|' \
+    -e 's|figs/fig5_timing\.pdf|Fig3.eps|' \
+    -e 's|\\usepackage{graphicx}|\\usepackage{graphicx}\\usepackage{epstopdf}|' main.tex > "$OUT/main.tex"
+sed -e 's|figs/figS1_logo_folds\.pdf|FigS1.eps|' \
+    -e 's|figs/fig4_robustness\.pdf|FigS2.eps|' \
+    -e 's|figs/fig3_spectral_response\.pdf|FigS3.eps|' \
+    -e 's|\\usepackage{graphicx}|\\usepackage{graphicx}\\usepackage{epstopdf}|' supplement.tex > "$OUT/ESM_1.tex"
 
 cp refs.bib sn-jnl.cls sn-basic.bst "$OUT/"
 
@@ -41,4 +46,4 @@ for doc in main ESM_1; do
   pdflatex -interaction=nonstopmode "$doc.tex" >/dev/null 2>&1 || true
   printf '%-12s %s pages\n' "$doc" "$(pdfinfo "$doc.pdf" | awk '/^Pages/{print $2}')"
 done
-rm -f *.aux *.log *.out *.blg
+rm -f *.aux *.log *.out *.blg *-eps-converted-to.pdf

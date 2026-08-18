@@ -6,3 +6,4 @@
 __pycache__/
 .texmf/
 submission/
+figs/*.eps

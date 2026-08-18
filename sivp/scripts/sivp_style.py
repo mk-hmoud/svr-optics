@@ -15,6 +15,8 @@ distinct dash patterns and direct end-of-curve labels -- so identity never rests
 on hue alone.  This also keeps the figures readable in greyscale print.
 """
 
+import os
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
@@ -80,6 +82,7 @@ def apply_style():
             "savefig.bbox": "tight",
             "savefig.pad_inches": 0.05,
             "pdf.fonttype": 42,
+            "ps.fonttype": 42,
         }
     )
 
@@ -96,6 +99,14 @@ FULLWIDTH_W = 6.95
 
 
 def save(fig, path):
+    """Write the figure as PDF (for the LaTeX build) and EPS (for submission).
+
+    Snapp accepts PNG, JPEG, SVG or EPS and does not list PDF; the journal's
+    artwork guidelines also name EPS as the preferred vector format. The PDF is
+    kept because pdflatex consumes it directly without an epstopdf round trip.
+    """
     fig.savefig(path)
+    eps = os.path.splitext(path)[0] + ".eps"
+    fig.savefig(eps)
     plt.close(fig)
-    print(f"wrote {path}")
+    print(f"wrote {path} and {os.path.basename(eps)}")
