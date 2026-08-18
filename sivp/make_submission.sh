@@ -42,6 +42,13 @@ sed -e '/^[[:space:]]*%/d' refs.bib > "$OUT/refs.bib"
 sed -i -e '/^[[:space:]]*%/d' "$OUT/main.tex"
 sed -i -e '/^[[:space:]]*%/d' "$OUT/ESM_1.tex"
 
+# The EPS files carry %%Title lines holding the internal names they were
+# generated under (fig5_timing.eps for what prints as Fig. 3, and so on).
+# Rewrite each to match its submitted filename so nothing internal ships.
+for f in "$OUT"/Fig*.eps; do
+  sed -i "1,10s|^%%Title:.*|%%Title: $(basename "$f")|" "$f"
+done
+
 # Build in place so the PDFs match the renamed sources.
 if [ -d .texmf ]; then
   for d in .texmf/*/; do TEXINPUTS="${TEXINPUTS:-}:$PWD/${d%/}"; done
