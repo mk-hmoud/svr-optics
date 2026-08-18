@@ -16,19 +16,20 @@ rm -rf "$OUT"; mkdir -p "$OUT"
 # EPS via epstopdf, which the class already pulls in through graphicx.
 # printed number -> source file
 cp figs/fig2_shap_importance.eps   "$OUT/Fig2.eps"   # main   Fig. 2
-cp figs/fig5_timing.eps            "$OUT/Fig3.eps"   # main   Fig. 3
 cp figs/figS1_logo_folds.eps       "$OUT/FigS1.eps"  # ESM_1  Fig. S1
 cp figs/fig4_robustness.eps        "$OUT/FigS2.eps"  # ESM_1  Fig. S2
 cp figs/fig3_spectral_response.eps "$OUT/FigS3.eps"  # ESM_1  Fig. S3
-# Fig. 1 is inline TikZ and has no file.
+cp figs/fig5_timing.eps            "$OUT/FigS4.eps"  # ESM_1  Fig. S4
+# Fig. 1 is inline TikZ and has no file. The manuscript carries only Fig. 2;
+# the timing figure moved to the supplement when the DOIs were restored.
 
 # Rewrite the \includegraphics paths to the renamed files.
 sed -e 's|figs/fig2_shap_importance\.pdf|Fig2.eps|' \
-    -e 's|figs/fig5_timing\.pdf|Fig3.eps|' \
     -e 's|\\usepackage{graphicx}|\\usepackage{graphicx}\\usepackage{epstopdf}|' main.tex > "$OUT/main.tex"
 sed -e 's|figs/figS1_logo_folds\.pdf|FigS1.eps|' \
     -e 's|figs/fig4_robustness\.pdf|FigS2.eps|' \
     -e 's|figs/fig3_spectral_response\.pdf|FigS3.eps|' \
+    -e 's|figs/fig5_timing\.pdf|FigS4.eps|' \
     -e 's|\\usepackage{graphicx}|\\usepackage{graphicx}\\usepackage{epstopdf}|' supplement.tex > "$OUT/ESM_1.tex"
 
 cp sn-jnl.cls sn-basic.bst "$OUT/"
@@ -68,5 +69,5 @@ rm -f *.aux *.log *.out *.blg *-eps-converted-to.pdf
 # so the archive must build standalone. ESM_1 is deliberately excluded -- a
 # second \documentclass in the same archive would confuse their compiler; it is
 # uploaded as supplementary material instead.
-zip -q manuscript.zip main.tex main.bbl refs.bib sn-jnl.cls sn-basic.bst Fig2.eps Fig3.eps
+zip -q manuscript.zip main.tex main.bbl refs.bib sn-jnl.cls sn-basic.bst Fig2.eps
 echo "manuscript.zip  $(unzip -l manuscript.zip | tail -1 | awk '{print $2}') files"
