@@ -388,7 +388,7 @@ that tube~\cite{smola2004}. Writing $C$ for the box constraint and $\xi_i$,
 $\xi_i^{*}$ for the slack variables, the primal problem minimises
 $\tfrac{1}{2}\|w\|^{2} + C\sum_{i}(\xi_i + \xi_i^{*})$ subject to the two
 $\epsilon$-tube constraints; the full formulation, its dual and the
-Karush-Kuhn-Tucker conditions are given in the Online Supplement, Sect.~S1. The
+Karush-Kuhn-Tucker conditions are given in Online Resource 1, Sect.~S1. The
 kernel is radial basis,
 $K(x_i,x_j) = \exp(-\gamma\|x_i - x_j\|^{2})$.
 
@@ -428,7 +428,7 @@ improvement, 32 evaluations, and log-uniform priors over
 $C\in[1,2000]$, $\gamma\in[10^{-4},1]$ and $\epsilon\in[10^{-4},10^{-1}]$,
 scoring each candidate by three-fold cross-validated MSE on the training
 partition only. The selected configuration and the full search space are
-tabulated in the Online Supplement, Sect.~S2.
+tabulated in Online Resource 1, Sect.~S2.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Results}\label{sec:results}
@@ -473,7 +473,7 @@ deviation of 0.226, against 0.825 $\pm$ 0.609 for the augmented benchmark. The
 gap in the standard deviation is the more useful number for a design tool: a
 surrogate that is accurate on average but occasionally wrong by a wide margin on
 an unfamiliar geometry cannot be trusted to drive an optimisation loop. Per-fold
-results are given in the Online Supplement, Sect.~S3.
+results are given in Online Resource 1, Sect.~S3.
 
 The comparison with Ehyaee et al.~\cite{ehyaee2024} requires careful statement.
 Their ML-enhanced ANN attains an MSE of 0.084, lower than the 0.121 reported
@@ -501,7 +501,7 @@ benefits models that are not so limited.
 Table~\ref{tab:augmentation} shows the support vector regressor degrading from
 0.121 to 0.197 and Gaussian process regression failing outright, and the
 direction of change is consistent across the leave-one-geometry-out folds
-(Online Supplement, Sect.~S3). Augmentation is therefore not introducing noise
+(Online Resource 1, Sect.~S3). Augmentation is therefore not introducing noise
 that averages out over folds; it is displacing the fit. On this evidence,
 WGAN-GP augmentation does not improve predictive accuracy in either case.
 
@@ -543,7 +543,7 @@ in the scaled feature space, and ranked the resulting pairs by the ratio of
 target discrepancy to feature distance. Table~\ref{tab:gan_fail} lists the three
 worst. The leading pair sits 0.011 apart in a space scaled to the unit cube, yet
 its targets differ by 0.168 in log-scaled loss, a 45\% discrepancy in physical
-units. The search protocol is detailed in the Online Supplement, Sect.~S4.
+units. The search protocol is detailed in Online Resource 1, Sect.~S4.
 
 \begin{table}[t]
 \caption{The three most contradictory nearest-neighbour pairs among 50,000
@@ -637,7 +637,7 @@ deviation, 100 Monte Carlo trials were run at each level, and the induced
 scatter in the predicted resonance wavelength was recorded. The experiment was
 then repeated perturbing one variable at a time in order to attribute that
 scatter. Peak jitter grows from 2.3\,nm at 1\% tolerance to 10.1\,nm at 5\%;
-the complete tables are given in the Online Supplement, Sect.~S6.
+the complete tables are given in Online Resource 1, Sect.~S6.
 
 The pitch $\Lambda$ dominates, contributing 5.49\,nm of jitter and 98.8\% of
 the variance in peak position, while the three hole diameters together
@@ -775,7 +775,7 @@ milliseconds and an evaluation cost of tens of microseconds.
 
 \bmhead{Supplementary information}
 
-The Online Supplement contains the SVR dual formulation and KKT conditions
+Online Resource 1 contains the SVR dual formulation and KKT conditions
 (Sect.~S1), the Bayesian optimisation search space and selected hyperparameters
 (Sect.~S2), per-fold leave-one-geometry-out results (Sect.~S3), the WGAN-GP
 configuration and contradiction-search protocol (Sect.~S4), a GPR kernel and

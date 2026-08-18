@@ -59,7 +59,7 @@ def main(src, out):
     df["label"] = [LABELS.get((m, st), f"{m} {st}") for m, st in zip(df.model, df.stage)]
 
     fig, (ax1, ax2) = plt.subplots(
-        2, 1, figsize=(COLUMN_W, 3.5), gridspec_kw={"height_ratios": [5, 3]}
+        2, 1, figsize=(COLUMN_W, 3.15), gridspec_kw={"height_ratios": [5, 3]}
     )
 
     # --- panel (a): training cost -------------------------------------------

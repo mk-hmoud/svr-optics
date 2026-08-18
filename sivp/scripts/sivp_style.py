@@ -42,9 +42,12 @@ def apply_style():
     """Install the journal figure defaults."""
     mpl.rcParams.update(
         {
-            "font.family": "serif",
-            "font.serif": ["DejaVu Serif", "Times New Roman", "Nimbus Roman"],
-            "mathtext.fontset": "dejavuserif",
+            # SIVP artwork guidelines: "To add lettering, it is best to use
+            # Helvetica or Arial (sans serif fonts)." That overrides matching
+            # the serif body text.
+            "font.family": "sans-serif",
+            "font.sans-serif": ["Nimbus Sans", "Helvetica", "Arial", "DejaVu Sans"],
+            "mathtext.fontset": "dejavusans",
             "font.size": 8.5,
             "axes.labelsize": 9,
             "axes.titlesize": 9,
