@@ -31,7 +31,16 @@ sed -e 's|figs/figS1_logo_folds\.pdf|FigS1.eps|' \
     -e 's|figs/fig3_spectral_response\.pdf|FigS3.eps|' \
     -e 's|\\usepackage{graphicx}|\\usepackage{graphicx}\\usepackage{epstopdf}|' supplement.tex > "$OUT/ESM_1.tex"
 
-cp refs.bib sn-jnl.cls sn-basic.bst "$OUT/"
+cp sn-jnl.cls sn-basic.bst "$OUT/"
+
+# Strip whole-line comments from the submitted source. The repo keeps them --
+# they record why things are the way they are -- but they are working notes, not
+# manuscript content, and Snapp receives the source, not just the PDF. Only lines
+# whose first non-space character is % are removed, so trailing %-continuations
+# and escaped \% are untouched.
+sed -e '/^[[:space:]]*%/d' refs.bib > "$OUT/refs.bib"
+sed -i -e '/^[[:space:]]*%/d' "$OUT/main.tex"
+sed -i -e '/^[[:space:]]*%/d' "$OUT/ESM_1.tex"
 
 # Build in place so the PDFs match the renamed sources.
 if [ -d .texmf ]; then
