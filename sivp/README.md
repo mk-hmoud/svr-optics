@@ -103,13 +103,14 @@ exits nonzero on failure, so it can gate a submission.
 
 ## Page budget
 
-The manuscript sits at exactly 10 pages, which is the SIVP limit, with page 10
-carrying references only (permitted). Two levers hold it there and are the first
-things to relax if content is added:
+The manuscript sits at exactly 10 pages, the SIVP limit, with page 10 carrying
+references only (permitted).
 
-- `\newcommand{\doi}[1]{}` near the top of `main.tex` suppresses DOIs in the
-  printed reference list. They stay in `refs.bib` for `verify_refs.py`. Deleting
-  that line restores them and costs roughly one page.
-- Spectral validation (Supplement S7), the per-variable robustness figure
-  (Supplement Fig. S3) and the SVR primal formulation (Supplement S1) were moved
-  out of the manuscript for space. Each can come back if something else goes.
+DOIs are printed in the reference list, as the guidelines require. 17 of the 23
+references carry one, and each wraps to two lines in a two-column measure, so
+they cost about a quarter page. That was paid for by moving the timing figure to
+Online Resource 1, Sect. S8; every number it plots is still stated in Sect. 5.5.
+
+Also in the supplement for space, and available to bring back if something else
+goes: spectral validation (S7), the per-variable robustness figure (Fig. S2) and
+the SVR primal formulation (S1).

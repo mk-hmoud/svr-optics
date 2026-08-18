@@ -45,7 +45,8 @@ configuration and the contradiction-search protocol (Sect.~\ref{sup:gan}), a
 Gaussian process kernel and regulariser ablation (Sect.~\ref{sup:gpr}), and the
 corrected Monte Carlo tolerance tables (Sect.~\ref{sup:mc}), and the predicted
 spectra underlying the sensitivity quoted in the article
-(Sect.~\ref{sup:spectral}). Section, table,
+(Sect.~\ref{sup:spectral}) and the measured computational cost
+(Sect.~\ref{sup:timing}). Section, table,
 figure and equation numbers are prefixed with S; citations refer to the
 reference list of the main article, reproduced here for convenience.}
 
@@ -444,6 +445,33 @@ the direction and the regularity of this shift indicates that the underlying
 coupling has been captured rather than the training spectra memorised. The corresponding
 sensitivity is 27.63 per refractive index unit in the units of the source
 dataset.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Measured computational cost}\label{sup:timing}
+
+Figure~\ref{fig:timing} plots the training and inference costs reported in
+Sect.~5.5 of the main article. All models were timed on the same machine
+(AMD Ryzen 5 5500U, 12 threads, CPU only), the same 432-sample dataset and the
+same software stack, so the ratios are meaningful even though the absolute
+seconds are hardware-specific.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.60\textwidth]{figs/fig5_timing.pdf}
+\caption{Measured cost of each model, on identical hardware and data.
+Panel~(a) gives the time to produce a usable model, on a logarithmic scale
+spanning four orders of magnitude; WGAN-GP training (highlighted) is the
+dominant term. Panel~(b) gives the per-sample inference cost, the quantity that
+governs a design sweep. Absolute values are hardware-specific; the ratios are
+not.}\label{fig:timing}
+\end{figure}
+
+The ordering is the point. Producing the support vector regressor, including its
+32-evaluation Bayesian search, costs about half a minute; training the WGAN-GP
+generator that supplies the synthetic samples costs 847\,s, some four orders of
+magnitude more than the 39\,ms fit it is intended to support. The generative
+route is therefore the most expensive stage of the pipeline while, on this
+dataset, reducing accuracy.
 
 \bibliography{refs}
 
