@@ -14,12 +14,13 @@ Gulrajani I, Ahmed F, Arjovsky M, et~al (2017) Improved training of
 
 \bibitem[{Hammoud et~al.(2026)Hammoud, Kalyoncu, and Yasli}]{hammoud2026siu}
 Hammoud MK, Kalyoncu C, Yasli A (2026) High-efficiency confinement loss
-  prediction via support vector regression. In: Proceedings of the 34th IEEE
-  Signal Processing and Communications Applications Conference (SIU)
+  prediction via support vector regression. In: 2026 34th Signal Processing and
+  Communications Applications Conference (SIU), pp 1--4,
+  \doi{10.1109/SIU71813.2026.11636469}
 
 \bibitem[{Rasmussen and Williams(2006)}]{rasmussen2006}
 Rasmussen CE, Williams CKI (2006) Gaussian Processes for Machine Learning. MIT
-  Press, Cambridge, MA
+  Press, Cambridge, MA, \doi{10.7551/mitpress/3206.001.0001}
 
 \bibitem[{Smola and Sch{\"o}lkopf(2004)}]{smola2004}
 Smola AJ, Sch{\"o}lkopf B (2004) A tutorial on support vector regression.

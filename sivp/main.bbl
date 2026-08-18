@@ -46,12 +46,13 @@ Gulrajani I, Ahmed F, Arjovsky M, et~al (2017) Improved training of
 
 \bibitem[{Hammoud et~al.(2026)Hammoud, Kalyoncu, and Yasli}]{hammoud2026siu}
 Hammoud MK, Kalyoncu C, Yasli A (2026) High-efficiency confinement loss
-  prediction via support vector regression. In: Proceedings of the 34th IEEE
-  Signal Processing and Communications Applications Conference (SIU)
+  prediction via support vector regression. In: 2026 34th Signal Processing and
+  Communications Applications Conference (SIU), pp 1--4,
+  \doi{10.1109/SIU71813.2026.11636469}
 
 \bibitem[{Johnson and Christy(1972)}]{johnson1972}
 Johnson PB, Christy RW (1972) Optical constants of the noble metals. Physical
-  Review B 6(12):4370--4379
+  Review B 6(12):4370--4379. \doi{10.1103/PhysRevB.6.4370}
 
 \bibitem[{Juwara et~al.(2024)Juwara, El-Hussuna, and El~Emam}]{juwara2024}
 Juwara L, El-Hussuna A, El~Emam K (2024) An evaluation of synthetic data
@@ -92,7 +93,7 @@ Opoku G, Opoku-Ware K, Danlard I, et~al (2026) A comparative analysis of ten
 
 \bibitem[{Rasmussen and Williams(2006)}]{rasmussen2006}
 Rasmussen CE, Williams CKI (2006) Gaussian Processes for Machine Learning. MIT
-  Press, Cambridge, MA
+  Press, Cambridge, MA, \doi{10.7551/mitpress/3206.001.0001}
 
 \bibitem[{Rifat et~al.(2017)Rifat, Ahmed, Yetisen, Butt, Sabouri, Mahdiraji,
   and Adikan}]{rifat2017}
