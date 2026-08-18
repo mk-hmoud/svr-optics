@@ -46,7 +46,13 @@ def apply_style():
             # Helvetica or Arial (sans serif fonts)." That overrides matching
             # the serif body text.
             "font.family": "sans-serif",
-            "font.sans-serif": ["Nimbus Sans", "Helvetica", "Arial", "DejaVu Sans"],
+            # DejaVu Sans first: it is a TrueType face, so matplotlib's
+            # pdf.fonttype=42 embeds it as CID TrueType and the declaration
+            # matches the embedded data. Nimbus Sans (the Helvetica clone) is
+            # OpenType/CFF, which matplotlib still declares as TrueType, and
+            # pdffonts flags "Mismatch between font type and embedded font
+            # file" -- a malformed declaration that a typesetter may reject.
+            "font.sans-serif": ["DejaVu Sans", "Arial", "Helvetica"],
             "mathtext.fontset": "dejavusans",
             "font.size": 8.5,
             "axes.labelsize": 9,
