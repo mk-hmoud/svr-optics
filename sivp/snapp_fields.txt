@@ -1,0 +1,11 @@
+TITLE
+-----
+Confinement-loss prediction in photonic crystal fiber SPR sensors: kernel surrogates versus generative data augmentation
+
+ABSTRACT (238 words)
+--------
+Designing photonic crystal fiber (PCF) based surface plasmon resonance (SPR) sensors requires repeated full-vectorial finite element simulation, which makes iterative geometric optimisation prohibitively slow. Machine-learned surrogates are the standard remedy, and the prevailing strategy is to grow the scarce simulation set with a generative adversarial network before fitting a deep network. We show that this strategy is counterproductive for the kernel models that suit this data regime. On a 432-sample full-vectorial finite element dataset, a Bayesian-optimised support vector regressor reaches a mean squared error of 0.121 on the held-out geometry, against 0.314 for the published GAN-augmented deep network, a 61% reduction achieved without synthetic data. Adding the same synthetic samples degrades both kernel models: the support vector regressor rises to 0.197 and Gaussian process regression collapses entirely. We trace the collapse to its cause, exhibiting generated sample pairs that sit 0.011 apart in scaled feature space yet differ by 0.168 in log-scaled loss, driving the covariance matrix towards singularity. Shapley attribution identifies the outer cladding holes as the dominant control on confinement loss, and a Monte Carlo study identifies the lattice pitch as the dominant source of resonance instability under fabrication error, at 98.8% of the variance in peak position. Timing measurements show the generative route to be the most expensive stage of the pipeline while reducing accuracy. The resulting surrogate is interpretable, trains in under a minute, and needs 70% less simulation data than comparable neural approaches.
+
+KEYWORDS
+--------
+Photonic crystal fiber, Surface plasmon resonance, Support vector regression, Explainable artificial intelligence, Bayesian optimisation, Surrogate modelling

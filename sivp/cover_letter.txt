@@ -1,0 +1,58 @@
+Dear Professor Çetin,
+
+We are pleased to submit "Confinement-loss prediction in photonic crystal fiber
+SPR sensors: kernel surrogates versus generative data augmentation" for
+consideration in Signal, Image and Video Processing. The manuscript is an
+extended version of our paper presented at SIU 2026, prepared following your
+invitation to the authors of that conference.
+
+Designing photonic crystal fiber based surface plasmon resonance sensors
+requires repeated full-vectorial finite element simulation, and that cost, not
+any modelling difficulty, is what limits practical design. The established
+remedy is a machine-learned surrogate; because deep surrogates need more data
+than simulation can cheaply supply, recent work has turned to generative
+adversarial networks to synthesise the missing samples.
+
+We show that this step is unnecessary for models suited to the data regime, and
+that it is actively harmful. A Bayesian-optimised support vector regressor
+trained on 432 finite element samples alone reaches a mean squared error of
+0.121 against 0.314 for the published GAN-augmented deep network. Adding the
+same synthetic samples raises that error to 0.197 and causes Gaussian process
+regression to fail outright. Rather than report the failure, we identify its
+mechanism: generated sample pairs that are near-identical in the input space
+yet carry incompatible targets, which drives the covariance matrix towards
+singularity. Timing measurements show the generative step to be the most
+expensive stage of the pipeline while reducing accuracy.
+
+The work also yields design guidance. Shapley attribution attributes confinement
+loss primarily to the outer cladding hole diameters, consistent with their role
+in gating evanescent leakage, and a Monte Carlo analysis identifies the lattice
+pitch as the dominant source of resonance instability under fabrication
+tolerance. We believe the results will interest readers working on
+machine-learned surrogates for physical systems more broadly, since the
+augmentation failure we characterise is not specific to this sensor.
+
+Relative to the conference version, the article adds per-geometry
+cross-validation of every model, the mechanistic account and supporting evidence
+for the Gaussian process failure, the manufacturing-tolerance analysis, measured
+training and inference costs, and an expanded treatment of related work and the
+evaluation protocol. In the course of preparing it we also corrected two results
+carried over from the conference paper: the spectral sensitivity, which was
+reported with an incorrect unit label, and the tolerance analysis, which had
+been evaluated at a geometry outside the sampled design space. Both corrections
+are stated explicitly in the manuscript.
+
+The manuscript is prepared in the Springer Nature template with the [iicol]
+option and is 10 pages, with supporting material supplied as Online Resource 1.
+All figures and tables have been newly prepared for this submission and none is
+reproduced from the conference paper. The work is original, is not under
+consideration elsewhere, and all authors have approved the submission.
+
+Thank you for your consideration.
+
+Yours sincerely,
+
+Mohammad Khaleel Hammoud
+On behalf of Cem Kalyoncu and Ahmet Yaşlı
+Department of Computer Engineering, European University of Lefke
+mhmdkhalil.h@gmail.com
