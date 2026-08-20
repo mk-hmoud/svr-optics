@@ -29,6 +29,12 @@
 \definecolor{figink}{HTML}{1A1A1A}
 \definecolor{inkmuted}{HTML}{6B6B6B}
 
+% Bookmark levels: \paragraph and \bmhead sit several levels below \section, so
+% hyperref reports "Difference between bookmark levels is greater than one" and
+% silently repairs the outline. Limiting the bookmark tree to sections and
+% subsections removes the jumps; the PDF outline is more useful for it.
+\hypersetup{bookmarksdepth=2}
+
 \raggedbottom
 
 \begin{document}
