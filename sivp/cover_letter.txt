@@ -1,10 +1,10 @@
-Dear Professor Çetin,
+Dear Editor,
 
 We are pleased to submit "Confinement-loss prediction in photonic crystal fiber
 SPR sensors: kernel surrogates versus generative data augmentation" for
 consideration in Signal, Image and Video Processing. The manuscript is an
-extended version of our paper presented at SIU 2026, prepared following your
-invitation to the authors of that conference.
+extended version of our paper presented at SIU 2026, prepared following the
+invitation extended to authors of that conference.
 
 Designing photonic crystal fiber based surface plasmon resonance sensors
 requires repeated full-vectorial finite element simulation, and that cost, not
@@ -36,11 +36,7 @@ Relative to the conference version, the article adds per-geometry
 cross-validation of every model, the mechanistic account and supporting evidence
 for the Gaussian process failure, the manufacturing-tolerance analysis, measured
 training and inference costs, and an expanded treatment of related work and the
-evaluation protocol. In the course of preparing it we also corrected two results
-carried over from the conference paper: the spectral sensitivity, which was
-reported with an incorrect unit label, and the tolerance analysis, which had
-been evaluated at a geometry outside the sampled design space. Both corrections
-are stated explicitly in the manuscript.
+evaluation protocol.
 
 The manuscript is prepared in the Springer Nature template with the [iicol]
 option and is 10 pages, with supporting material supplied as Online Resource 1.
