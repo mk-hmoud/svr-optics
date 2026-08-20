@@ -17,3 +17,17 @@ M.K.H. implemented the surrogate models, ran the augmentation, explainability, r
   M.K.H. = Mohammad Khaleel Hammoud
   C.K.   = Cem Kalyoncu
   A.Y.   = Ahmet Yasli
+
+DUAL PUBLICATION -- answer: YES
+------------------------------
+A preliminary version of this work was presented at the 34th Signal Processing and Communications Applications Conference (SIU 2026) and published in its proceedings: M. K. Hammoud, C. Kalyoncu and A. Yasli, "High-Efficiency Confinement Loss Prediction via Support Vector Regression", 2026 34th SIU, pp. 1-4, doi:10.1109/SIU71813.2026.11636469. The present manuscript is an extended version, submitted following the invitation extended to authors of that conference.
+
+Overlap with the conference paper: the core accuracy comparison between the support vector regressor and the published GAN-augmented network, and the finding that generative augmentation degrades kernel models, were reported there in preliminary form.
+
+New in this manuscript: per-geometry leave-one-geometry-out cross-validation of every model; the mechanistic account of the Gaussian process failure together with the contradictory-pair evidence supporting it; the manufacturing-tolerance analysis; measured training and inference costs for all models; a Gaussian process regulariser ablation; and an expanded treatment of related work and the evaluation protocol. Two results carried over from the conference paper were also corrected: the spectral sensitivity, which was reported there with an incorrect unit label, and the tolerance analysis, which had been evaluated at a geometry outside the sampled design space.
+
+No figure or table is reproduced from the conference paper. All have been newly prepared for this submission, from the source data.
+
+The finite element dataset analysed here was generated in the course of A. Zelaci et al., J. Lightwave Technol. 39(5):1515-1522 (2021), doi:10.1109/JLT.2020.3035580, and is publicly available at https://github.com/Aimen-Zelaci/SPRPCF_ANN. It is cited as such in the manuscript.
+
+The manuscript is not under consideration by any other publisher.
