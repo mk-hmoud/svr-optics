@@ -12,7 +12,7 @@ Photonic crystal fiber, Surface plasmon resonance, Support vector regression, Ex
 
 AUTHOR CONTRIBUTIONS
 --------------------
-M.K.H. implemented the surrogate models, ran the augmentation, explainability, robustness and timing experiments, prepared all figures and tables, and wrote the main manuscript text. C.K. supervised the machine-learning methodology and revised the manuscript. A.Y. provided the photonic modelling and the full-vectorial finite element dataset and revised the manuscript. All authors reviewed the manuscript.
+M.K.H. implemented the surrogate models, ran the augmentation, explainability, robustness and timing experiments, prepared all figures and tables, and wrote the machine-learning sections of the manuscript. C.K. supervised the machine-learning methodology and revised the manuscript. A.Y. provided the photonic modelling and the full-vectorial finite element dataset, and wrote the sensor structure and numerical model section. All authors reviewed the manuscript.
 
   M.K.H. = Mohammad Khaleel Hammoud
   C.K.   = Cem Kalyoncu
