@@ -9,7 +9,7 @@ invitation extended to authors of that conference.
 Designing photonic crystal fiber based surface plasmon resonance sensors
 requires repeated full-vectorial finite element simulation, and that cost, not
 any modelling difficulty, is what limits practical design. The established
-remedy is a machine-learned surrogate; because deep surrogates need more data
+remedy is a machine-learned surrogate, because deep surrogates need more data
 than simulation can cheaply supply, recent work has turned to generative
 adversarial networks to synthesise the missing samples.
 
