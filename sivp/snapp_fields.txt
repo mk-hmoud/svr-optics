@@ -31,3 +31,23 @@ No figure or table is reproduced from the conference paper. All have been newly 
 The finite element dataset analysed here was generated in the course of A. Zelaci et al., J. Lightwave Technol. 39(5):1515-1522 (2021), doi:10.1109/JLT.2020.3035580, and is publicly available at https://github.com/Aimen-Zelaci/SPRPCF_ANN. It is cited as such in the manuscript.
 
 The manuscript is not under consideration by any other publisher.
+
+DATA AVAILABILITY -- answer: YES
+--------------------------------
+The dataset analysed in this study was generated in the course of A. Zelaci, A. Yasli, C. Kalyoncu and H. Ademgil, "Generative Adversarial Neural Networks Model of Photonic Crystal Fiber Based Surface Plasmon Resonance Sensor", Journal of Lightwave Technology 39(5):1515-1522 (2021), doi:10.1109/JLT.2020.3035580. It is publicly available at https://github.com/Aimen-Zelaci/SPRPCF_ANN (file src/data/data.xlsx).
+
+No new experimental data were generated for this study. The derived results reported in the manuscript were computed from that dataset.
+
+
+ACKNOWLEDGEMENTS
+----------------
+The authors thank the Department of Computer Engineering, European University of Lefke, for computational support.
+
+
+RESEARCH FUNDING -- answer: YES
+-------------------------------
+Funder: European University of Lefke, Research Fund (BAPKO)
+Grant number: BAPKO.0392620
+
+Statement as it appears in the manuscript:
+This work was supported by the Research Fund of the European University of Lefke, project number BAPKO.0392620.
