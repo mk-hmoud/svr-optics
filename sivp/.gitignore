@@ -7,3 +7,5 @@ __pycache__/
 .texmf/
 submission/
 figs/*.eps
+cover_letter.tex
+cover_letter.log
