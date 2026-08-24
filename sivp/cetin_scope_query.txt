@@ -1,0 +1,36 @@
+Subject: SIVP submission rejected as out of scope — SIU 2026 extended paper
+
+Dear Prof. Çetin,
+
+Following your invitation to SIU 2026 authors, we submitted our extended
+manuscript to Signal, Image and Video Processing:
+
+  Title:         Confinement-loss prediction in photonic crystal fiber SPR
+                 sensors: kernel surrogates versus generative data augmentation
+  Authors:       Mohammad Khaleel Hammoud, Cem Kalyoncu, Ahmet Yaşlı
+                 (European University of Lefke)
+  Submission ID: 7d8d9e69-85d5-438a-b7a3-36e8c102db70
+  SIU paper:     doi:10.1109/SIU71813.2026.11636469
+
+The manuscript passed the technical check and was rejected before review by
+the editorial office, on the grounds that it is not within the scope of the
+journal.
+
+Since we submitted at your invitation, I wanted to bring this to your
+attention in case the decision was made without that context. We have not
+accepted the transfer offer, so the submission is still with SIVP.
+
+The work is a machine-learning study: it compares kernel regression against
+generative data augmentation for surrogate modelling, and reports an
+explainability analysis, a Monte Carlo robustness study and measured
+training and inference costs. The application is a photonic sensor, but the
+contribution is methodological.
+
+If you would like me to resubmit, reframe the manuscript, or take it
+elsewhere, I would be grateful for your guidance.
+
+With thanks for your time,
+
+Mohammad Khaleel Hammoud
+Department of Computer Engineering, European University of Lefke
+mhmdkhalil.h@gmail.com
