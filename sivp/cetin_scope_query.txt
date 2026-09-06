@@ -15,9 +15,9 @@ what happened.
 
 The manuscript passed the SIVP technical check and was then rejected before
 review by the editorial office, on the grounds that it is not within the
-scope of the journal. I suspect this is because I submitted it as a regular
-article rather than to the SIU Special Issue; I did not see an option to
-associate it with the collection.
+scope of the journal. I submitted it as an ordinary research article, as I
+did not find a way to indicate that it belonged to the SIU special issue.
+I do not know whether that is what went wrong.
 
 Following the rejection I accepted the automatic transfer offer, so the
 manuscript is now under consideration at the International Journal of Data

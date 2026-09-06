@@ -1,0 +1,40 @@
+[Reply in the existing "SIU Special Issue" thread. CC: Mohammad Khaleel
+Hammoud <mhmdkhalil.h@gmail.com>, Ahmet Yaşlı <ayasli@eul.edu.tr>]
+
+Merhaba Enis,
+
+Our submission is not in your list because it was rejected, and I would
+value your advice on what happened.
+
+  Title:      Confinement-loss prediction in photonic crystal fiber SPR
+              sensors: kernel surrogates versus generative data augmentation
+  Authors:    Mohammad Khaleel Hammoud, Cem Kalyoncu, Ahmet Yaşlı
+              (European University of Lefke)
+  SIU paper:  doi:10.1109/SIU71813.2026.11636469
+  SIVP ID:    7d8d9e69-85d5-438a-b7a3-36e8c102db70
+
+The manuscript passed the SIVP technical check and was then rejected before
+review by the editorial office, as not within the scope of the journal. We
+suspect the cause is that it went in as a regular article rather than to the
+SIU Special Issue — we did not find an option to associate it with the
+collection.
+
+After the rejection we accepted the automatic transfer offer, so it is now
+under consideration at the International Journal of Data Science and
+Analytics (c2fcbcec-dd09-479b-8370-40620200dfa0), past technical check and
+awaiting an editor.
+
+If it should have gone to the special issue, we would gladly withdraw it
+from IJDSA and resubmit before 15 September. We did not want to do that
+without asking, as it is currently under consideration and we do not want it
+under review in two places.
+
+The manuscript is in the format you specified: SN template with [iicol], 10
+pages, the rest as an online supplement, and all figures and tables redrawn
+rather than reused from the SIU paper.
+
+Mohammad, the corresponding author, is copied and can answer anything about
+the submission itself.
+
+Teşekkürler,
+Cem
